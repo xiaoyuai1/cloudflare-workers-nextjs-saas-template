@@ -145,6 +145,13 @@ export const SITE_DOMAIN = new URL(SITE_URL).hostname
 export const LOCAL_HOSTNAMES: readonly string[] = ["localhost", "127.0.0.1", "[::1]"];
 export const PASSWORD_RESET_TOKEN_EXPIRATION_SECONDS = 24 * 60 * 60 // 24 hours
 export const EMAIL_VERIFICATION_TOKEN_EXPIRATION_SECONDS = 24 * 60 * 60 // 24 hours
+// Template kill-switch for the email-verification gate, like I18N_ENABLED. A fork without the
+// EMAIL `send_email` binding (Workers Paid) can never deliver the verification link, so the gate
+// would lock every account behind a dialog that cannot be dismissed and a FORBIDDEN on every
+// write. With this false, the verification dialog and the requireVerifiedEmail check are both
+// disabled, while sign-up still sends (or logs) the email and /verify-email still accepts tokens,
+// so flipping this back to true restores the full flow without migration.
+export const EMAIL_VERIFICATION_REQUIRED = false;
 export const MAX_SESSIONS_PER_USER = 5;
 export const MAX_TEAMS_CREATED_PER_USER = 3;
 export const MAX_TEAMS_JOINED_PER_USER = 10;

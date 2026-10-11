@@ -13,7 +13,7 @@ import { useAction } from "next-safe-action/hooks";
 import { sendVerificationAction } from "@/app/[locale]/(auth)/send-verification.action";
 import { toast } from "sonner";
 import { useState } from "react";
-import { EMAIL_VERIFICATION_TOKEN_EXPIRATION_SECONDS } from "@/constants";
+import { EMAIL_VERIFICATION_REQUIRED, EMAIL_VERIFICATION_TOKEN_EXPIRATION_SECONDS } from "@/constants";
 import { isLocalhost } from "@/utils/is-local";
 import { usePathname } from "@/i18n/navigation";
 import { Route } from "next";
@@ -53,10 +53,11 @@ export function EmailVerificationDialog() {
     },
   });
 
-  // Don't show the dialog if the user is not logged in, if their email is already verified,
-  // or if we're on the verify-email page
+  // Don't show the dialog when verification is off, if the user is not logged in, if their email
+  // is already verified, or if we're on the verify-email page
   if (
-    !session
+    !EMAIL_VERIFICATION_REQUIRED
+    || !session
     || session.user.emailVerified
     || pagesToBypass.includes(pathname)
   ) {

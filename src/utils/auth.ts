@@ -16,6 +16,7 @@ import { cache } from "react"
 import type { CookieSession, CurrentSession, SessionValidationResult } from "@/types";
 import {
   AUTH_SESSION_PRESENT_COOKIE_NAME,
+  EMAIL_VERIFICATION_REQUIRED,
   SESSION_COOKIE_NAME,
 } from "@/constants";
 import { ActionError } from "@/lib/action-error";
@@ -361,27 +362,44 @@ interface RequireSessionOptions {
   doNotThrowError?: boolean;
 }
 
-const getRequiredVerifiedEmail = cache(async (doNotThrowError = false) => {
+// Shared envelope for the `require*` gates: resolve the session, then apply one refusal policy.
+// `doNotThrowError` turns every refusal into a null so probes (`hasTeamMembership`) can ask
+// without catching.
+async function requireSessionOrRefuse(
+  doNotThrowError: boolean,
+  refuse: (session: CurrentSession) => ActionError | null,
+): Promise<CurrentSession | null> {
   const session = await getCurrentSession();
 
-  if (!session && doNotThrowError) {
-    return null;
-  }
-
   if (!session) {
-    throw new ActionError("NOT_AUTHORIZED", { key: "Client.Errors.notAuthenticated" });
-  }
-
-  if (!session?.user?.emailVerified) {
     if (doNotThrowError) {
       return null;
     }
 
-    throw new ActionError("FORBIDDEN", { key: "Client.Errors.emailVerificationRequired" });
+    throw new ActionError("NOT_AUTHORIZED", { key: "Client.Errors.notAuthenticated" });
+  }
+
+  const refusal = refuse(session);
+
+  if (refusal) {
+    if (doNotThrowError) {
+      return null;
+    }
+
+    throw refusal;
   }
 
   return session;
-});
+}
+
+const getRequiredVerifiedEmail = cache((doNotThrowError = false) =>
+  requireSessionOrRefuse(doNotThrowError, (session) => {
+    if (EMAIL_VERIFICATION_REQUIRED && !session?.user?.emailVerified) {
+      return new ActionError("FORBIDDEN", { key: "Client.Errors.emailVerificationRequired" });
+    }
+
+    return null;
+  }));
 
 // Overloads make the nullability visible at the type level: the default (throwing) form always
 // resolves to a session, so callers don't need a dead `if (!session)` guard, while the explicit
@@ -394,27 +412,14 @@ export function requireVerifiedEmail({
   return getRequiredVerifiedEmail(doNotThrowError);
 }
 
-const getRequiredAdmin = cache(async (doNotThrowError = false) => {
-  const session = await getCurrentSession();
-
-  if (!session && doNotThrowError) {
-    return null;
-  }
-
-  if (!session) {
-    throw new ActionError("NOT_AUTHORIZED", { key: "Client.Errors.notAuthenticated" });
-  }
-
-  if (session.user.role !== ROLES_ENUM.ADMIN) {
-    if (doNotThrowError) {
-      return null;
+const getRequiredAdmin = cache((doNotThrowError = false) =>
+  requireSessionOrRefuse(doNotThrowError, (session) => {
+    if (session.user.role !== ROLES_ENUM.ADMIN) {
+      return new ActionError("FORBIDDEN", { key: "Client.Errors.notAuthorized" });
     }
 
-    throw new ActionError("FORBIDDEN", { key: "Client.Errors.notAuthorized" });
-  }
-
-  return session;
-});
+    return null;
+  }));
 
 // Same overload pair as `requireVerifiedEmail`, and for the same reason: the default (throwing)
 // form always resolves to a session, so an admin caller that needs the acting user's id does not
