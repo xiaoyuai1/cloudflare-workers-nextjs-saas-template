@@ -7,7 +7,7 @@ import { cmsConfig, type CollectionsUnion } from "@/../cms.config";
 import { getCmsEntryById, getEntryLocaleSiblings } from "@/lib/cms/entry";
 import {
   getCmsNavigationNodeByEntrySlug,
-  getFreshCmsNavigationTree,
+  getCmsNavigationTree,
 } from "@/lib/cms/cms-navigation-repository";
 import { CMS_STATUS_FILTER_ALL } from "@/types/cms";
 import { CmsEntryForm } from "../_components/cms-entry-form";
@@ -86,10 +86,10 @@ export default async function EditEntryPage({ params }: EditEntryPageProps) {
   const navigationNode = navigationKey
     ? getCmsNavigationNodeByEntrySlug({
         slug: entry.slug,
-        nodes: (await getFreshCmsNavigationTree({
+        nodes: await getCmsNavigationTree({
           navigationKey,
           status: CMS_STATUS_FILTER_ALL,
-        })).nodes,
+        }),
       })
     : null;
   const entryPublicUrl = navigationNode?.resolvedPath

@@ -24,7 +24,6 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { warnAfterCmsWrite } from "@/app/[locale]/(app)/(admin)/admin/cms/_components/zone-purge-warning";
 
 type TagFormProps = {
   mode: "create" | "edit";
@@ -40,9 +39,8 @@ export function TagForm({ mode, tag }: TagFormProps) {
   const [color, setColor] = useState(tag?.color || "#000000");
 
   const { execute: createTag, isExecuting: isCreating } = useAction(createCmsTagAction, {
-    onSuccess: ({ data }) => {
+    onSuccess: () => {
       toast.success("Tag created successfully");
-      warnAfterCmsWrite(data);
       router.push("/admin/cms/tags");
     },
     onError: ({ error }) => {
@@ -50,9 +48,8 @@ export function TagForm({ mode, tag }: TagFormProps) {
     },
   });
   const { execute: updateTag, isExecuting: isUpdating } = useAction(updateCmsTagAction, {
-    onSuccess: ({ data }) => {
+    onSuccess: () => {
       toast.success("Tag updated successfully");
-      warnAfterCmsWrite(data);
       router.push("/admin/cms/tags");
     },
     onError: ({ error }) => {
@@ -60,9 +57,8 @@ export function TagForm({ mode, tag }: TagFormProps) {
     },
   });
   const { execute: deleteTag, isExecuting: isDeleting } = useAction(deleteCmsTagAction, {
-    onSuccess: ({ data }) => {
+    onSuccess: () => {
       toast.success("Tag deleted successfully");
-      warnAfterCmsWrite(data);
       router.push("/admin/cms/tags");
     },
     onError: ({ error }) => {

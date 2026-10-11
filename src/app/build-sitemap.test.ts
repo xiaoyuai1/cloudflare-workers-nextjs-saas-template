@@ -1,7 +1,6 @@
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { cmsConfig, type CollectionsUnion } from "@/../cms.config";
-import { CMS_ENTRY_STATUS } from "@/app/enums";
 import { I18N_ENABLED } from "@/constants";
 import { BLOG_LISTING_ROUTES } from "@/constants/public-routes";
 import { DEFAULT_LOCALE, ENABLED_LOCALES, type Locale } from "@/i18n/config";
@@ -132,15 +131,10 @@ describe.skipIf(!SITEMAP_COLLECTION)("CMS entry alternates", () => {
     );
   });
 
-  // Published only: a draft translation has no public page, so it must not become an hreflang.
-  test("resolves the published locales of every entry slug in one lookup per collection", async () => {
+  test("resolves the locales of every entry slug in one lookup per collection", async () => {
     const urls = await buildSitemapUrls();
 
-    expect(getEntryLocalesForSlugs).toHaveBeenCalledWith({
-      collectionSlug,
-      slugs: [ENTRY_SLUG],
-      status: CMS_ENTRY_STATUS.PUBLISHED,
-    });
+    expect(getEntryLocalesForSlugs).toHaveBeenCalledWith({ collectionSlug, slugs: [ENTRY_SLUG] });
     expect(urls).toContain(urlFor({ pathname: entryPath, locale: DEFAULT_LOCALE }));
   });
 

@@ -27,11 +27,6 @@ import { DEFAULT_LOCALE } from "@/i18n/config";
 import { toast } from "sonner";
 import type { GetCmsCollectionResult } from "@/lib/cms/entry";
 import { ALERT_BLOCK_NODE_NAME } from "@/components/tiptap-node/alert-block/alert-block-types";
-import { reloadAfterCmsWrite } from "@/app/[locale]/(app)/(admin)/admin/cms/_components/zone-purge-warning";
-
-// Version rows saved before history kept dates have none, so the restore saved a draft.
-const SCHEDULE_CLEARED_MESSAGE =
-  "Entry restored as a draft. That version has no publish date, so set the schedule again.";
 
 interface DiffSegment {
   type: "changed" | "unchanged";
@@ -278,20 +273,10 @@ function renderBlockChildren({
 }: {
   node: JSONContent;
 }): string {
-  return renderNonEmptyChildren({ node, separator: "\n\n" });
-}
-
-function renderNonEmptyChildren({
-  node,
-  separator,
-}: {
-  node: JSONContent;
-  separator: string;
-}): string {
   return (node.content ?? [])
     .map((child) => renderMarkdownNode({ node: child, parentType: node.type }))
     .filter((value) => value.trim().length > 0)
-    .join(separator);
+    .join("\n\n");
 }
 
 function renderInlineChildren({ node }: { node: JSONContent }): string {
@@ -369,7 +354,10 @@ function getListMarker({
 }
 
 function renderListItem({ node }: { node: JSONContent }): string {
-  return renderNonEmptyChildren({ node, separator: "\n" });
+  return (node.content ?? [])
+    .map((child) => renderMarkdownNode({ node: child, parentType: node.type }))
+    .filter((value) => value.trim().length > 0)
+    .join("\n");
 }
 
 function renderImage(node: JSONContent): string {
@@ -553,15 +541,12 @@ export function VersionHistory({
   }, [isOpen, entryId, fetchVersions]);
 
   const { execute: revertVersion, isExecuting: isReverting } = useAction(revertCmsEntryVersionAction, {
-    onSuccess: ({ data }) => {
+    onSuccess: () => {
+      toast.success("Entry reverted successfully");
       onOpenChange(false);
       setSelectedVersion(null);
       window.onbeforeunload = null;
-      // A refresh does not re-seed the editor form, so reload; the next page shows the toasts.
-      reloadAfterCmsWrite({
-        successMessage: data?.scheduleCleared ? SCHEDULE_CLEARED_MESSAGE : "Entry reverted successfully",
-        write: data,
-      });
+      window.location.reload();
     },
     onError: ({ error }) => {
       toast.error(error.serverError?.message || "Failed to revert entry");
@@ -808,7 +793,7 @@ export function VersionHistory({
                       Comparing Version {selectedVersion.versionNumber} ({formatRelativeDateTime(selectedVersion.createdAt, DEFAULT_LOCALE)})
                     </h3>
                     <p className="text-xs text-muted-foreground">
-                      Changes needed to restore this version from the current entry{currentVersion ? ` (${formatRelativeDateTime(currentVersion.updatedAt, DEFAULT_LOCALE)})` : ''}
+                      Changes needed to restore this version from the current entry{currentVersion ? ` (${formatRelativeDateTime(currentVersion.createdAt, DEFAULT_LOCALE)})` : ''}
                     </p>
                   </div>
                   <div className="flex gap-2">

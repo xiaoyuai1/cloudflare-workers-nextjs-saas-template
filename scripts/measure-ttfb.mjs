@@ -5,7 +5,7 @@
 import { EDGE_HTML_CACHE_HEADER } from "../src/constants/edge-html-cache.ts";
 import { BLOG_BASE_PATH } from "../src/lib/blog-routing.ts";
 import { DOCS_BASE_PATH } from "../src/lib/cms/docs-config.ts";
-import { resolveDeployedSiteUrl } from "./utils/deploy-site-url.mjs";
+import { parseWranglerConfig } from "./utils/parse-wrangler.mjs";
 
 const SITEMAP_PATH = "/sitemap.xml";
 const SITEMAP_LOC_PATTERN = /<loc>([^<]+)<\/loc>/g;
@@ -13,6 +13,26 @@ const WARM_SAMPLES = 3;
 const REQUEST_TIMEOUT_MS = 20000;
 const USER_AGENT = "ttfb-baseline";
 const NUMERIC_SEGMENT_PATTERN = /^\d+$/;
+
+/** The deployed origin: an explicit argument, then the build variable, then the Worker route. */
+function resolveBaseUrl() {
+  const explicit = process.argv[2]?.trim() || process.env.NEXT_PUBLIC_SITE_URL?.trim();
+
+  if (explicit) {
+    return explicit.replace(/\/+$/, "");
+  }
+
+  const routes = parseWranglerConfig().routes ?? [];
+  const pattern = routes
+    .map((route) => (typeof route === "string" ? route : route?.pattern))
+    .find((candidate) => typeof candidate === "string" && candidate.length > 0);
+
+  if (!pattern) {
+    return undefined;
+  }
+
+  return `https://${pattern.split("/")[0].replace(/^\*\./, "")}`;
+}
 
 function median(values) {
   const sorted = [...values].sort((a, b) => a - b);
@@ -142,7 +162,7 @@ function skip({ id, reason }) {
 }
 
 async function main() {
-  const baseUrl = resolveDeployedSiteUrl(process.argv[2]);
+  const baseUrl = resolveBaseUrl();
 
   if (!baseUrl) {
     console.error(

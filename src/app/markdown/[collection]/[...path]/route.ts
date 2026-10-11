@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import { CMS_DATA_CACHE_TTL } from "@/constants/data-cache";
 
 import { cmsConfig, isCollectionSlug, type CollectionsUnion } from "@/../cms.config";
 import { CMS_ENTRY_STATUS } from "@/app/enums";
@@ -207,7 +206,7 @@ async function resolveCachedDocsMarkdownPath({
   "use cache: remote";
   setCacheScope({
     tags: DOCS_NAVIGATION_CACHE_TAGS,
-    ttl: CMS_DATA_CACHE_TTL,
+    ttl: "8 hours",
   });
 
   // Docs paths are locale-invariant. Resolve them from the canonical tree, then load the requested
@@ -270,7 +269,7 @@ async function renderCachedEntryMarkdown({
   "use cache: remote";
   setCacheScope({
     tags: entryCacheTags({ collectionSlug, slug }),
-    ttl: CMS_DATA_CACHE_TTL,
+    ttl: "8 hours",
   });
 
   const localizedEntry = await getCmsEntryBySlug({

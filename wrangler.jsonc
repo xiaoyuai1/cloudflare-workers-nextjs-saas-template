@@ -1,12 +1,12 @@
 {
     "$schema": "node_modules/wrangler/config-schema.json",
-    "account_id": "0d5667a195a90458761fe59fca898f9c",
-    "name": "cloudflare-workers-nextjs-saas-template",
+    "account_id": "0ce2869905292483d658d486a6e31a3c",
+    "name": "saas",
     "main": "./worker-entrypoint.ts",
     "preview_urls": true,
     "routes": [
       {
-        "pattern": "nextjs-saas-template.lubomirgeorgiev.com",
+        "pattern": "saas.3webweb.com",
         "custom_domain": true
       }
     ],
@@ -33,9 +33,6 @@
       "traces": {
         "enabled": true,
         "head_sampling_rate": 0.1,
-      },
-      "issues": {
-        "enabled": true
       }
     },
     "upload_source_maps": true,
@@ -49,12 +46,12 @@
       "producers": [
         {
           "binding": "SCHEDULER_QUEUE",
-          "queue": "cloudflare-workers-nextjs-saas-template-scheduler"
+          "queue": "saas-scheduler"
         }
       ],
       "consumers": [
         {
-          "queue": "cloudflare-workers-nextjs-saas-template-scheduler",
+          "queue": "saas-scheduler",
           "max_batch_size": 20,
           "max_batch_timeout": 5,
           "max_retries": 5,
@@ -71,27 +68,21 @@
         "APP_TEST_MODE": "false",
         // Keep equal to `account_id`. The runtime cannot read that field, and without this var the
         // zone lookup fails, so the CMS publish never purges stored HTML in other data centers.
-        "CLOUDFLARE_ACCOUNT_ID": "0d5667a195a90458761fe59fca898f9c",
+        "CLOUDFLARE_ACCOUNT_ID": "0ce2869905292483d658d486a6e31a3c",
         // Admin icon picker only; a fork that self-hosts Iconify changes this one value.
         "ICONIFY_API_ORIGIN": "https://api.iconify.design",
-        "EMAIL_FROM": "no-reply@notifications.lubomirgeorgiev.com",
-        "EMAIL_FROM_NAME": "Lubomir Georgiev",
-        "EMAIL_REPLY_TO": "lubo@lubomirgeorgiev.com"
+        // Email Sending (the `send_email` binding) needs the Workers Paid plan, so this deployment
+        // omits the binding and no transactional email is sent; see src/utils/email.tsx. These
+        // vars stay so a paid-plan fork only has to re-add the binding.
+        "EMAIL_FROM": "no-reply@notifications.saas.3webweb.com",
+        "EMAIL_FROM_NAME": "SaaS Template",
+        "EMAIL_REPLY_TO": "no-reply@notifications.saas.3webweb.com"
     },
-    "send_email": [
-        {
-            "name": "EMAIL",
-            "allowed_sender_addresses": [
-                "no-reply@notifications.lubomirgeorgiev.com"
-            ],
-            "remote": true
-        }
-    ],
     "d1_databases": [
         {
             "binding": "D1_DB",
-            "database_name": "cloudflare-workers-nextjs-saas",
-            "database_id": "db968793-55f4-481e-b281-7e1907a775b1",
+            "database_name": "saas-db",
+            "database_id": "db4b99e8-3d09-45a3-a760-abfc7182b969",
             "migrations_dir": "src/db/migrations",
             "migrations_pattern": "src/db/migrations/*/migration.sql"
         }
@@ -99,7 +90,7 @@
     "kv_namespaces": [
         {
             "binding": "KV_STORE",
-            "id": "e922d6e22f4a46b6a92be653e90c6ca1"
+            "id": "beee087c0fa74b33a0ec7724ef12b5d2"
         },
         // Second binding onto the SAME namespace: @cloudflare/workers-oauth-provider hardcodes the
         // `OAUTH_KV` binding name, and forking the template must not require provisioning anything
@@ -107,7 +98,7 @@
         // re-audit those prefixes whenever the library is upgraded.
         {
             "binding": "OAUTH_KV",
-            "id": "e922d6e22f4a46b6a92be653e90c6ca1"
+            "id": "beee087c0fa74b33a0ec7724ef12b5d2"
         }
     ],
     "migrations": [
@@ -123,7 +114,7 @@
     "r2_buckets": [
         {
             "binding": "R2_BUCKET",
-            "bucket_name": "cloudflare-workers-nextjs-saas-template"
+            "bucket_name": "saas-media"
         }
     ]
   }

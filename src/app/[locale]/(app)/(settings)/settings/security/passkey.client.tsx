@@ -11,7 +11,7 @@ import {
 } from "./passkey-settings.actions";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ClientRelativeTime } from "@/components/client-relative-time";
+import { formatRelativeDateTime } from "@/utils/format-date";
 import { formatDeviceDescription } from "@/utils/format-device-description";
 import { ConfirmDestructiveDialog } from "@/components/confirm-destructive-dialog";
 import { useRouter } from "next/navigation";
@@ -148,7 +148,7 @@ export function PasskeysList({ passkeys, currentPasskeyId, email }: PasskeysList
                       {isCurrentPasskey(passkey) && <Badge>{t("currentPasskeyBadge")}</Badge>}
                     </CardTitle>
                     <div className="text-sm text-muted-foreground whitespace-nowrap">
-                      · <ClientRelativeTime value={passkey.createdAt} locale={locale} />
+                      · {formatRelativeDateTime(passkey.createdAt, locale)}
                     </div>
                   </div>
                   {passkey.parsedUserAgent && (

@@ -221,34 +221,20 @@ describe("the zone helpers", () => {
     expect(url.searchParams.get("hostname")).toBe(SITE_DOMAIN);
   });
 
-  // Every stored page asks for the zone, so a failure that is not remembered costs a call per page.
-  test("a failed lookup answers null, skips the API within the failure window, then retries", async () => {
-    vi.useFakeTimers({ toFake: ["Date"] });
-    vi.setSystemTime(0);
+  test("a failed lookup is answered with null and is never memoized as success", async () => {
     fetcher.mockResolvedValueOnce(jsonResponse({
       success: false,
       result: null,
       errors: [{ code: 10000, message: "Authentication error" }],
       messages: [],
     }, { status: 403 }));
-    fetcher.mockResolvedValueOnce(workersDomainsResponse());
     const { getWorkerZoneId } = await loadCloudflareApi();
 
-    try {
-      expect(await getWorkerZoneId()).toBeNull();
+    expect(await getWorkerZoneId()).toBeNull();
 
-      vi.setSystemTime(59_999);
+    fetcher.mockResolvedValueOnce(workersDomainsResponse());
 
-      expect(await getWorkerZoneId()).toBeNull();
-      expect(fetcher).toHaveBeenCalledTimes(1);
-
-      vi.setSystemTime(60_000);
-
-      expect(await getWorkerZoneId()).toBe("zone-1");
-      expect(fetcher).toHaveBeenCalledTimes(2);
-    } finally {
-      vi.useRealTimers();
-    }
+    expect(await getWorkerZoneId()).toBe("zone-1");
   });
 
   test("a host with no Workers domain resolves to null", async () => {
@@ -339,18 +325,6 @@ describe("the zone helpers", () => {
     expect(fetcher).not.toHaveBeenCalled();
   });
 
-  test("the zone purge is configured only when the purge config resolves", async () => {
-    workerEnv.CLOUDFLARE_ZONE_ID = "zone-override";
-    const configured = await loadCloudflareApi();
-
-    expect(await configured.isZonePurgeConfigured()).toBe(true);
-
-    workerEnv.CLOUDFLARE_API_TOKEN = "";
-    const unconfigured = await loadCloudflareApi();
-
-    expect(await unconfigured.isZonePurgeConfigured()).toBe(false);
-  });
-
   test("the purge posts purge_everything to the zone and reports the purge id", async () => {
     fetcher.mockResolvedValue(jsonResponse({
       success: true,
@@ -385,24 +359,6 @@ describe("the zone helpers", () => {
     expect(new URL(first.url).pathname).toBe("/client/v4/zones/zone-1/purge_cache");
     expect(await first.json()).toEqual({ tags: tags.slice(0, 100) });
     expect(await getFetchRequest({ callIndex: 1, fetcher }).json()).toEqual({ tags: tags.slice(100) });
-  });
-
-  test("a prefix purge posts the prefixes in chunks of at most 100", async () => {
-    fetcher.mockImplementation(async () =>
-      jsonResponse({ success: true, errors: [], messages: [], result: null }),
-    );
-    const { purgeZoneCachePrefixes } = await loadCloudflareApi();
-    const prefixes = Array.from({ length: 101 }, (_, index) => `example.com/__edge-html/b/s-${index}`);
-
-    await purgeZoneCachePrefixes({ apiToken: "token-1", zoneId: "zone-1", prefixes });
-
-    expect(fetcher).toHaveBeenCalledTimes(2);
-    const first = getFetchRequest({ callIndex: 0, fetcher });
-    expect(new URL(first.url).pathname).toBe("/client/v4/zones/zone-1/purge_cache");
-    expect(await first.json()).toEqual({ prefixes: prefixes.slice(0, 100) });
-    expect(await getFetchRequest({ callIndex: 1, fetcher }).json()).toEqual({
-      prefixes: prefixes.slice(100),
-    });
   });
 
   test("a tag purge with no tags sends no request", async () => {

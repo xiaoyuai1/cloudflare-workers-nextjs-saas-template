@@ -6,7 +6,6 @@ import type { Metadata } from "next"
 import { getBlogFacetPage, getBlogPageCounts } from "@/lib/cms/blog-list-artifacts"
 import { BlogPaginationServer } from "@/components/blog-pagination-server"
 import {
-  getBlogCollectionMetadataPage,
   getLocalesWithBlogPage,
   isBlogPageOutOfRange,
   requireBlogCollectionPage,
@@ -36,7 +35,7 @@ export async function generateMetadata({
   params,
 }: TagPageProps): Promise<Metadata> {
   const { locale, slug, page: pageParam } = await params
-  const page = getBlogCollectionMetadataPage({ pageParam });
+  const page = requireBlogCollectionPage({ pathname: `/blog/tags/${slug}`, pageParam, locale });
   const tMeta = await getTranslator({ locale, namespace: "Blog.TagDetail.meta" })
   const facetPage = await getBlogFacetPage({ locale, facet: { type: "tag", slug } })
   const tag = facetPage?.subject

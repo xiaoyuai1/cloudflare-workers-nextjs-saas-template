@@ -1,7 +1,6 @@
 import "server-only";
 
 import { cache } from "react";
-import { CMS_DATA_CACHE_TTL } from "@/constants/data-cache";
 
 import { CMS_ENTRY_STATUS } from "@/app/enums";
 import { cmsRendererBuildId } from "@/lib/cms/cms-renderer-build-id";
@@ -78,7 +77,7 @@ async function loadCachedDocsEntryArtifacts({
     tags: [
       CACHE_TAGS.cmsEntry({ collectionSlug, slug }),
     ],
-    ttl: CMS_DATA_CACHE_TTL,
+    ttl: "8 hours",
   });
 
   // Fetch the locale-specific row so the table of contents matches the body

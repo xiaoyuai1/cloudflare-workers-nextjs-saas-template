@@ -3,10 +3,6 @@ import "server-only";
 import { cache as workersCache } from "cloudflare:workers";
 
 import { CACHE_TAG_MAX_LENGTH, ZONE_PURGE_TAGS_PER_REQUEST } from "@/constants";
-import {
-  WORKERS_CACHE_PURGE_OUTCOME,
-  type WorkersCachePurgeOutcome,
-} from "@/constants/cache-purge";
 import { chunk } from "@/utils/chunk";
 import { recordSpanException, withSpan } from "@/utils/trace";
 
@@ -14,32 +10,33 @@ const PURGE_SPAN_NAME = "app.cms.cdn_purge";
 const OUTCOME_ATTRIBUTE = "app.cms.outcome";
 const TAG_COUNT_ATTRIBUTE = "app.cms.tag_count";
 
+export const WORKERS_CACHE_PURGE_OUTCOME = {
+  OK: "ok",
+  FAILED: "failed",
+  SKIPPED_UNAVAILABLE: "skipped_unavailable",
+} as const;
+
 /**
- * Purges the Workers Caching entries that carry any of `tags`, which `revalidateCacheTag` never
- * reaches. A purge reaches only the cache of its own entrypoint (see `docs/edge-caching.md`). Never
- * throws. Returns `failed` when a tag was not purged, so a caller can tell the user a copy stays.
+ * Purges the Workers Caching entries that carry any of `tags`, the outer edge layer that
+ * `revalidateCacheTag` never reaches. Every handler has `cache.purge`, the queue consumer included.
+ * A purge reaches only its own entrypoint's cache (see `docs/edge-caching.md`). Never throws.
  */
-export async function purgeWorkersCacheTags({
-  tags,
-}: {
-  tags: readonly string[];
-}): Promise<WorkersCachePurgeOutcome> {
+export async function purgeWorkersCacheTags({ tags }: { tags: readonly string[] }): Promise<void> {
   const uniqueTags = Array.from(new Set(tags.filter((tag) => tag.length > 0)));
   const purgeableTags = uniqueTags.filter((tag) => tag.length <= CACHE_TAG_MAX_LENGTH);
-  const droppedTags = purgeableTags.length < uniqueTags.length;
 
   // One over-long tag would make Cloudflare refuse its whole chunk.
-  if (droppedTags) {
+  if (purgeableTags.length < uniqueTags.length) {
     console.error("Workers Caching purge dropped over-long tags", {
       count: uniqueTags.length - purgeableTags.length,
     });
   }
 
   if (purgeableTags.length === 0) {
-    return droppedTags ? WORKERS_CACHE_PURGE_OUTCOME.FAILED : WORKERS_CACHE_PURGE_OUTCOME.OK;
+    return;
   }
 
-  const outcome = await withSpan({
+  await withSpan({
     name: PURGE_SPAN_NAME,
     run: async (span) => {
       span.setAttribute(TAG_COUNT_ATTRIBUTE, purgeableTags.length);
@@ -57,12 +54,8 @@ export async function purgeWorkersCacheTags({
       }
 
       span.setAttribute(OUTCOME_ATTRIBUTE, outcome);
-
-      return outcome;
     },
   });
-
-  return droppedTags ? WORKERS_CACHE_PURGE_OUTCOME.FAILED : outcome;
 }
 
 /** The type says always present, but local workerd gives no `cache.purge`. */
@@ -99,3 +92,6 @@ async function runCachePurge({
 
   return failed ? WORKERS_CACHE_PURGE_OUTCOME.FAILED : WORKERS_CACHE_PURGE_OUTCOME.OK;
 }
+
+type WorkersCachePurgeOutcome =
+  (typeof WORKERS_CACHE_PURGE_OUTCOME)[keyof typeof WORKERS_CACHE_PURGE_OUTCOME];

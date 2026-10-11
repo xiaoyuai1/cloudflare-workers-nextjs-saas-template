@@ -1,7 +1,6 @@
 import "server-only"
 
 import { createNavigationMemo } from "@/lib/cms/navigation-memos"
-import { CMS_DATA_CACHE_TTL } from "@/constants/data-cache"
 import { DOCS_NAVIGATION_CACHE_TAGS } from "@/lib/cms/cms-section-cache-tags"
 import { setCacheScope } from "@/utils/cache"
 import { getNavigationNodeDisplayTitle } from "@/types/cms-navigation"
@@ -35,7 +34,7 @@ async function loadCurrentDocsPage({ slugParts, locale }: CurrentDocsPageParams)
   "use cache: remote";
   setCacheScope({
     tags: DOCS_NAVIGATION_CACHE_TAGS,
-    ttl: CMS_DATA_CACHE_TTL,
+    ttl: "8 hours",
   });
   const docsNavigation = getCmsNavigationConfig(DOCS_SLUG)
 

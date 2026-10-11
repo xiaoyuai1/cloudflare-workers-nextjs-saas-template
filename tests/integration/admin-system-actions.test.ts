@@ -14,7 +14,6 @@ vi.stubGlobal("__MARKDOWN_BUILD_ID__", "test-build-id");
 import { ROLES_ENUM } from "@/app/enums";
 import { adminApiApp } from "@/api/admin";
 import { adminApiDocument } from "@/api/admin/generated-document";
-import { EDGE_HTML_ZONE_PURGE_OUTCOME } from "@/constants/edge-html-cache";
 import { MARKDOWN_PAGE_CACHE_PREFIX, VINEXT_CACHE_PREFIX } from "@/constants/kv-prefixes";
 import { getDB } from "@/db";
 import { apiKeyTable, userTable } from "@/db/schema";
@@ -55,7 +54,6 @@ interface ProblemOrResult {
   errors?: { in: string; pointer: string; code: string }[];
   message?: string;
   deletedKeyCount?: number;
-  zonePurge?: string;
 }
 
 let seq = 0;
@@ -144,7 +142,6 @@ test("purging the edge HTML cache reports how many stored pages were deleted", a
   expect(typeof body.deletedKeyCount).toBe("number");
   expect(body.deletedKeyCount).toBeGreaterThanOrEqual(0);
   expect(typeof body.message).toBe("string");
-  expect(Object.values(EDGE_HTML_ZONE_PURGE_OUTCOME)).toContain(body.zonePurge);
 });
 
 // The same confirmation contract as the other purges, and the same guard ahead of it.

@@ -32,7 +32,6 @@ import {
   STATIC_API_DOCUMENT_EDGE_CACHE_CONTROL,
 } from "@/constants/cache-control";
 import { CACHE_TAGS, formatCacheTagHeader } from "@/constants/cache-tags";
-import { EDGE_HTML_CACHE_AGE_HEADER } from "@/constants/edge-html-cache";
 import { MARKDOWN_PAGE_CACHE_PREFIX } from "@/constants/kv-prefixes";
 import { I18N_ENABLED } from "@/constants";
 import {
@@ -172,21 +171,6 @@ describe("worker edge integration", () => {
     expect(response.status).toBe(307);
     expect(response.headers.get("location")).toBe("https://example.com/blog?page=2");
     expect(innerFetchMock).not.toHaveBeenCalled();
-  });
-
-  // Either flag state: pages name their card under the default-locale prefix, so the edge must not
-  // collapse it. `decideLocaleRoute` serves it in place.
-  test("passes a default-locale card URL through to the app", async () => {
-    const card = `/${DEFAULT_LOCALE}/docs/opengraph-image-abc123`;
-    const response = await worker.fetch(
-      new Request(`https://example.com${card}?v=1`, { redirect: "manual" }),
-      env,
-      createExecutionContext(),
-    );
-
-    expect(response.status).toBe(200);
-    expect(innerFetchMock).toHaveBeenCalledTimes(1);
-    expect(new URL(innerFetchMock.mock.calls[0][0].url).pathname).toBe(card);
   });
 
   test("forwards a CMS .md URL to the Markdown route without a redirect", async () => {
@@ -784,38 +768,6 @@ describe("edge HTML page cache", () => {
     await expect(hit.text()).resolves.toBe(PAGE_BODY);
   });
 
-  test("a hit reports the age of the stored copy, and a miss reports none", async () => {
-    const storedAt = Date.now();
-    const elapsedSeconds = 42;
-    const nowSpy = vi.spyOn(Date, "now").mockReturnValue(storedAt);
-
-    try {
-      const miss = await fetchPage(PAGE_PATH);
-      nowSpy.mockReturnValue(storedAt + elapsedSeconds * 1000);
-      const hit = await fetchPage(PAGE_PATH);
-
-      expect(edgeCacheStatus(hit)).toBe(EDGE_HTML_CACHE_STATUS.HIT);
-      expect(hit.headers.get(EDGE_HTML_CACHE_AGE_HEADER)).toBe(String(elapsedSeconds));
-      expect(miss.headers.get(EDGE_HTML_CACHE_AGE_HEADER)).toBeNull();
-    } finally {
-      nowSpy.mockRestore();
-    }
-  });
-
-  // The stored timestamp is private to the stored copy, like the parked `cache-control`.
-  test("a hit carries no private header of the stored copy", async () => {
-    await fetchPage(PAGE_PATH);
-    const hit = await fetchPage(PAGE_PATH);
-    const leaked = Array.from(hit.headers.keys()).filter(
-      (name) => name.startsWith(EDGE_HTML_CACHE_HEADER) &&
-        name !== EDGE_HTML_CACHE_HEADER &&
-        name !== EDGE_HTML_CACHE_AGE_HEADER,
-    );
-
-    expect(edgeCacheStatus(hit)).toBe(EDGE_HTML_CACHE_STATUS.HIT);
-    expect(leaked).toEqual([]);
-  });
-
   // The whole post-processing is inside the stored copy, so an agent or a browser reading a hit
   // sees the discovery relations, the preloads, and the `Vary` a miss carries.
   test("a hit carries the headers a miss carries", async () => {
@@ -968,16 +920,6 @@ describe("edge HTML page cache", () => {
     },
   );
 
-  // With no API token only the local delete runs, and it still drops the subtree root.
-  test("a subtree purge drops the stored copy of its root page", async () => {
-    await fetchPage(PAGE_PATH);
-    expect(edgeCacheStatus(await fetchPage(PAGE_PATH))).toBe(EDGE_HTML_CACHE_STATUS.HIT);
-
-    await purgeEdgeHtmlPages({ pathnames: [], subtreePathnames: [PAGE_PATH] });
-
-    expect(edgeCacheStatus(await fetchPage(PAGE_PATH))).toBe(EDGE_HTML_CACHE_STATUS.MISS);
-  });
-
   test("a purge whose deletes all fail logs once, with the failed count", async () => {
     const pathnames = [PAGE_PATH, "/dashboard"];
     // The DOM lib types `caches` without the Workers-only `default`, which workerd provides here.
@@ -986,7 +928,7 @@ describe("edge HTML page cache", () => {
     const consoleError = vi.spyOn(console, "error").mockImplementation(() => undefined);
 
     try {
-      await expect(purgeEdgeHtmlPages({ pathnames })).resolves.toMatchObject({ deletedCount: 0 });
+      await expect(purgeEdgeHtmlPages({ pathnames })).resolves.toBe(0);
 
       expect(consoleError).toHaveBeenCalledOnce();
       expect(consoleError.mock.calls[0]?.[1]).toMatchObject({

@@ -1,10 +1,8 @@
 import "server-only";
 
 import { cache } from "react";
-import { CMS_DATA_CACHE_TTL } from "@/constants/data-cache";
 import { and, count, desc, eq } from "drizzle-orm";
 
-import { CMS_ENTRY_STATUS } from "@/app/enums";
 import { getDB } from "@/db";
 import {
   cmsEntryTable,
@@ -26,29 +24,23 @@ import {
   CMS_STATUS_FILTER_ALL,
   type CmsStatusFilter,
 } from "@/types/cms";
-import { BLOG_COLLECTION_SLUG } from "@/lib/blog-routing";
 import { CMS_TAGS_CACHE_TAGS } from "@/lib/cms/cms-section-cache-tags";
 import { setCacheScope } from "@/utils/cache";
 import { DEFAULT_LOCALE, type Locale } from "@/i18n/config";
 import { v } from "@/lib/validation";
 
-// For public pages. Admin screens call `getFreshCmsTags`: a dropped cache tag can still serve
-// the old list for about 2 minutes (isolate memory plus the KV read cache).
+// Canonical tag rows own counts and stable junction fields; locale siblings only
+// overlay display fields.
 export async function getCmsTags(params?: GetCmsTagsParams) {
   "use cache: remote";
   setCacheScope({
     tags: CMS_TAGS_CACHE_TAGS,
-    ttl: CMS_DATA_CACHE_TTL,
+    ttl: "8 hours",
   });
 
-  return getFreshCmsTags(params);
-}
-
-// Canonical tag rows own counts and stable junction fields; locale siblings only overlay display
-// fields. Not the replica client: a lagging replica would refill the `getCmsTags` cache without a
-// new tag for 8 hours.
-export async function getFreshCmsTags(params?: GetCmsTagsParams) {
   const locale = params?.locale ?? DEFAULT_LOCALE;
+  // Not the replica client: the admin entry form creates a tag and reloads this same list at once,
+  // so a lagging replica would refill the cache without the new tag for 8 hours.
   const db = getDB();
 
   const tags = await db
@@ -65,17 +57,10 @@ export async function getFreshCmsTags(params?: GetCmsTagsParams) {
       createdAt: cmsTagTable.createdAt,
       updatedAt: cmsTagTable.updatedAt,
       updateCounter: cmsTagTable.updateCounter,
-      entryCount: params?.countPublishedPosts ? count(cmsEntryTable.id) : count(cmsEntryTagTable.id),
+      entryCount: count(cmsEntryTagTable.id),
     })
     .from(cmsTagTable)
     .leftJoin(cmsEntryTagTable, eq(cmsTagTable.id, cmsEntryTagTable.tagId))
-    // The public tag pages list only published blog posts in their locale, so the count matches them.
-    .leftJoin(cmsEntryTable, and(
-      eq(cmsEntryTable.id, cmsEntryTagTable.entryId),
-      eq(cmsEntryTable.status, CMS_ENTRY_STATUS.PUBLISHED),
-      eq(cmsEntryTable.collection, BLOG_COLLECTION_SLUG),
-      eq(cmsEntryTable.locale, locale),
-    ))
     .where(eq(cmsTagTable.locale, DEFAULT_LOCALE))
     .groupBy(cmsTagTable.id)
     .orderBy(desc(cmsTagTable.createdAt));

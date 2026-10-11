@@ -4,7 +4,7 @@ import { format } from "date-fns";
 
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { DEFAULT_LOCALE } from "@/i18n/config";
-import { ClientRelativeTime } from "@/components/client-relative-time";
+import { formatRelativeDateTime } from "@/utils/format-date";
 
 /** Full timestamp shown on hover; date-fns pattern for "Apr 29, 1453 at 1:12:00 PM". */
 const ABSOLUTE_DATE_FORMAT = "PPpp";
@@ -27,9 +27,7 @@ export function RelativeDateCell({
 
   return (
     <Tooltip>
-      <TooltipTrigger>
-        <ClientRelativeTime value={value} locale={DEFAULT_LOCALE} />
-      </TooltipTrigger>
+      <TooltipTrigger>{formatRelativeDateTime(value, DEFAULT_LOCALE)}</TooltipTrigger>
       <TooltipContent>
         <p>{format(new Date(value), ABSOLUTE_DATE_FORMAT)}</p>
       </TooltipContent>

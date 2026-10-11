@@ -1,5 +1,4 @@
 import { DOCS_LLMS_TXT_CACHE_CONTROL } from "@/constants/cache-control";
-import { CMS_DATA_CACHE_TTL } from "@/constants/data-cache";
 import { formatCacheTagHeader } from "@/constants/cache-tags";
 import { buildLlmsTxtContent } from "@/lib/cms/build-llms-txt";
 import { getCmsNavigationTree } from "@/lib/cms/cms-navigation-repository";
@@ -18,7 +17,7 @@ async function getCachedLlmsTxtBody(): Promise<string> {
   "use cache: remote";
   setCacheScope({
     tags: LLMS_TXT_CACHE_TAGS,
-    ttl: CMS_DATA_CACHE_TTL,
+    ttl: "8 hours",
   });
 
   const [blogEntries, docsNodes] = await Promise.all([

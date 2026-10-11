@@ -2,7 +2,6 @@ import { afterEach, describe, expect, test, vi } from "vitest";
 
 import { collectionSlugs } from "@/../cms.config";
 import { CMS_ENTRY_STATUS } from "@/app/enums";
-import { PUBLISH_STATE_CHANGES } from "@/lib/cms/cms-invalidation-scopes";
 import { SCHEDULED_JOB_TYPES } from "@/lib/scheduler/jobs";
 
 const {
@@ -77,11 +76,10 @@ function mockDatabase({
   existingEntry: unknown;
   latestVersion?: { versionNumber: number };
 }) {
-  // The returned row applies the written values, so a test sees what the history row copies.
-  const setMock = vi.fn((values: Record<string, unknown>) => ({
+  const setMock = vi.fn(() => ({
     where: vi.fn(() => ({
       returning: vi.fn(async () => (
-        existingEntry ? [{ ...(existingEntry as Record<string, unknown>), ...values }] : []
+        existingEntry ? [{ ...existingEntry, status: CMS_ENTRY_STATUS.PUBLISHED }] : []
       )),
     })),
   }));
@@ -158,7 +156,6 @@ describe("CMS entry publishing", () => {
       slug: DRAFT_ENTRY.slug,
       seoDescription: DRAFT_ENTRY.seoDescription,
       status: CMS_ENTRY_STATUS.PUBLISHED,
-      publishedAt: NOW,
       featuredImageId: DRAFT_ENTRY.featuredImageId,
       createdBy: DRAFT_ENTRY.createdBy,
     }]);
@@ -198,10 +195,6 @@ describe("CMS entry publishing", () => {
     await publishCmsEntryNow({ entryId: DRAFT_ENTRY.id, now: NOW });
 
     expect(insertValuesMock).not.toHaveBeenCalled();
-    // A retry changes no publish state, so it can flip no header link.
-    expect(invalidateEntryAndCollectionMock).toHaveBeenCalledWith(
-      expect.objectContaining({ publishStateChange: null }),
-    );
   });
 
   test("stamps publishedAt only when the entry has none", async () => {
@@ -245,7 +238,6 @@ describe("CMS entry publishing", () => {
       collectionSlug: COLLECTION,
       slug: DRAFT_ENTRY.slug,
       warm: true,
-      publishStateChange: PUBLISH_STATE_CHANGES.PUBLISHED,
     });
   });
 

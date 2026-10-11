@@ -12,7 +12,6 @@ import {
 import { rejectNextRuntimeInternals, vinextTestAliases } from "./tests/vinext-test-runtime.ts";
 import { INTEGRATION_OPTIMIZED_DEPENDENCIES } from "./tools/integration-optimized-dependencies.ts";
 import { openApiDocument } from "./tools/openapi-document.ts";
-import { vinextCacheAdaptersModule } from "./tools/vinext-cache-config.ts";
 
 function readNestedD1Migrations(migrationsPath: string): D1Migration[] {
   const migrationsDirectory = fileURLToPath(new URL(`${migrationsPath}/`, import.meta.url));
@@ -37,7 +36,6 @@ export default defineConfig({
   logLevel: "error",
   plugins: [
     openApiDocument(),
-    vinextCacheAdaptersModule(),
     rejectNextRuntimeInternals(),
     cloudflareTest(async () => ({
       miniflare: {

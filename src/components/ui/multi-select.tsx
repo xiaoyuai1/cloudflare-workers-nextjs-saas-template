@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/popover";
 import {
   Command,
+  CommandEmpty,
   CommandGroup,
   CommandInput,
   CommandItem,
@@ -1043,12 +1044,9 @@ export const MultiSelect = React.forwardRef<MultiSelectRef, MultiSelectProps>(
                   screenSize === "mobile" && "max-h-[50vh]",
                   "overscroll-behavior-y-contain"
                 )}>
-                {/* CommandEmpty hides itself when any CommandItem exists, and the Close item always does. */}
-                {countVisibleOptions(filteredOptions) === 0 && (
-                  <div role="status" aria-live="polite" className="py-6 text-center text-sm">
-                    {emptyIndicator || "No results found."}
-                  </div>
-                )}
+                <CommandEmpty>
+                  {emptyIndicator || "No results found."}
+                </CommandEmpty>{" "}
                 {!hideSelectAll && !searchValue && (
                   <CommandGroup>
                     <CommandItem
@@ -1208,15 +1206,5 @@ export const MultiSelect = React.forwardRef<MultiSelectRef, MultiSelectProps>(
 );
 
 MultiSelect.displayName = "MultiSelect";
-
-export function countVisibleOptions(
-  options: MultiSelectOption[] | MultiSelectGroup[]
-): number {
-  return options.reduce(
-    (count, option) => count + ("options" in option ? option.options.length : 1),
-    0
-  );
-}
-
 // oxlint-disable-next-line project/no-unused-module-exports -- Shadcn/Radix modules intentionally expose optional composition slots.
 export type { MultiSelectOption, MultiSelectGroup, MultiSelectProps };

@@ -21,8 +21,7 @@ import type {
   QueuePreviewTableState,
   ScheduledJobTableRow,
 } from "@/lib/scheduler/admin";
-import { formatDateTime } from "@/utils/format-date";
-import { ClientRelativeTime } from "@/components/client-relative-time";
+import { formatDateTime, formatRelativeDateTime } from "@/utils/format-date";
 import { DEFAULT_LOCALE } from "@/i18n/config";
 
 function formatPayload(value: unknown): string {
@@ -104,9 +103,7 @@ const d1JobColumns: ColumnDef<ScheduledJobTableRow>[] = [
     header: "Run At",
     cell: ({ row }) => (
       <div className="whitespace-nowrap">
-        <div>
-          <ClientRelativeTime value={row.original.runAt} locale={DEFAULT_LOCALE} />
-        </div>
+        <div>{formatRelativeDateTime(row.original.runAt, DEFAULT_LOCALE)}</div>
         <div className="text-xs text-muted-foreground">
           {formatDateTime(row.original.runAt, DEFAULT_LOCALE)}
         </div>

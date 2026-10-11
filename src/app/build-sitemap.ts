@@ -1,8 +1,6 @@
 import "server-only"
 import { CMS_MAX_SLUGS_PER_LOOKUP, SITE_URL } from "@/constants"
-import { CMS_DATA_CACHE_TTL } from "@/constants/data-cache"
 import type { CollectionsUnion } from "@/../cms.config"
-import { CMS_ENTRY_STATUS } from "@/app/enums"
 import { getEntryLocalesForSlugs } from "@/lib/cms/entry"
 import { collectPublicPages, type PublicPage } from "@/lib/sitemap/public-pages"
 import type { MetadataRoute } from "next"
@@ -48,7 +46,6 @@ async function readEntryLocales(pages: PublicPage[]): Promise<EntryLocales> {
       const batch = await getEntryLocalesForSlugs({
         collectionSlug,
         slugs: slugs.slice(index, index + CMS_MAX_SLUGS_PER_LOOKUP),
-        status: CMS_ENTRY_STATUS.PUBLISHED,
       })
 
       batch.forEach((locales, slug) => localesBySlug.set(slug, Array.from(locales)))
@@ -87,7 +84,7 @@ export async function buildSitemap(): Promise<MetadataRoute.Sitemap> {
   "use cache: remote"
   setCacheScope({
     tags: [CACHE_TAGS.SITEMAP],
-    ttl: CMS_DATA_CACHE_TTL,
+    ttl: '8 hours',
   })
 
   const pages = await collectPublicPages()

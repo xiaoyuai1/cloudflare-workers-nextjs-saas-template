@@ -1,6 +1,6 @@
 import "server-only";
 
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import type { JSONContent } from "@tiptap/core";
 
 import { cmsConfig, type CollectionsUnion } from "@/../cms.config";
@@ -12,13 +12,7 @@ import {
   cmsEntryTagTable,
   type CmsEntry,
 } from "@/db/schema";
-import { ActionError } from "@/lib/action-error";
-import {
-  invalidateDeletedCmsEntry,
-  invalidateEntryAndCollection,
-} from "@/lib/cms/cms-cache-invalidation";
-import { getPublishStateChange } from "@/lib/cms/cms-invalidation-scopes";
-import { getCmsNavigationEntryPaths } from "@/lib/cms/cms-navigation-entry-paths";
+import { invalidateEntryAndCollection } from "@/lib/cms/cms-cache-invalidation";
 import {
   removeCmsEntrySearch,
   syncCmsEntrySearch,
@@ -32,11 +26,6 @@ import {
   deleteCmsPublishSchedule,
   syncCmsPublishSchedule,
 } from "@/lib/cms/entry/publishing";
-import {
-  assertCmsSlugAvailable,
-  cmsGroupSlugRenameQuery,
-  syncCmsGroupSearch,
-} from "@/lib/cms/entry/slug-group";
 import {
   createCmsEntryParamsSchema,
   createCmsEntryTranslationParamsSchema,
@@ -61,11 +50,6 @@ import { DEFAULT_LOCALE, isKnownLocale } from "@/i18n/config";
 import type { SourceContentHashes } from "@/types/cms";
 import { v } from "@/lib/validation";
 import { idField } from "@/schemas/fields";
-
-// Admin tooling is English-only, so this is plain copy, not a catalog key.
-const RETRANSLATE_UNAVAILABLE_MESSAGE =
-  "AI translation was unavailable, so the translation was not changed. Try again later, or " +
-  "edit it by hand.";
 
 export async function createCmsEntry<T extends CollectionsUnion>(
   params: CreateCmsEntryParams<T>
@@ -167,7 +151,6 @@ async function syncCreatedEntrySideEffects({
     collectionSlug,
     slug: entry.slug,
     warm: entry.status === CMS_ENTRY_STATUS.PUBLISHED,
-    publishStateChange: getPublishStateChange({ statusBefore: null, statusAfter: entry.status }),
   });
 }
 
@@ -239,7 +222,23 @@ export async function updateCmsEntry(params: UpdateCmsEntryParams): Promise<CmsE
   const isSlugChanging = slug !== undefined && slug !== existingEntry.slug;
 
   if (isSlugChanging) {
-    await assertCmsSlugAvailable({ collection: existingEntry.collection, slug });
+    // This group's siblings all still hold the OLD slug here (the cascade below runs
+    // after), so any row already on the new slug belongs to a DIFFERENT group — a
+    // real conflict. No self-exclusion clause is needed.
+    const [conflictingEntry] = await db
+      .select({ id: cmsEntryTable.id })
+      .from(cmsEntryTable)
+      .where(
+        and(
+          eq(cmsEntryTable.collection, existingEntry.collection),
+          eq(cmsEntryTable.slug, slug)
+        )
+      )
+      .limit(1);
+
+    if (conflictingEntry) {
+      throw new Error(`Entry with slug "${slug}" already exists in collection "${existingEntry.collection}"`);
+    }
   }
 
   const finalStatus = status ?? existingEntry.status;
@@ -263,24 +262,26 @@ export async function updateCmsEntry(params: UpdateCmsEntryParams): Promise<CmsE
     Object.entries(updateData).filter(([__, value]) => value !== undefined)
   );
 
-  const entryUpdate = db
+  const [updatedEntry] = await db
     .update(cmsEntryTable)
     .set(filteredUpdateData)
     .where(eq(cmsEntryTable.id, id))
     .returning();
 
-  // D1 has no transactions: one batch, so the edited row and its locale siblings move together.
-  // Only the edited row gets a version snapshot; the siblings are not re-versioned.
-  const [[updatedEntry]] = isSlugChanging
-    ? await db.batch([
-      entryUpdate,
-      cmsGroupSlugRenameQuery({
-        collection: existingEntry.collection,
-        fromSlug: existingEntry.slug,
-        toSlug: slug,
-      }),
-    ])
-    : [await entryUpdate];
+  if (isSlugChanging) {
+    // Cascade the rename to every OTHER locale sibling on the old slug so the group
+    // stays linked. Only the edited row above moved to the new slug and got a new
+    // cms_entry_version snapshot; the siblings are not re-versioned.
+    await db
+      .update(cmsEntryTable)
+      .set({ slug })
+      .where(
+        and(
+          eq(cmsEntryTable.collection, existingEntry.collection),
+          eq(cmsEntryTable.slug, existingEntry.slug)
+        )
+      );
+  }
 
   if (tagIds) {
     await db.delete(cmsEntryTagTable).where(eq(cmsEntryTagTable.entryId, id));
@@ -303,19 +304,27 @@ export async function updateCmsEntry(params: UpdateCmsEntryParams): Promise<CmsE
     });
   }
 
-  // A slug change moved every locale row, and the index stores the slug, so all rows re-index.
-  if (isSlugChanging) {
-    await syncCmsGroupSearch({ collection: updatedEntry.collection, slug: updatedEntry.slug });
-  } else {
-    await syncCmsEntrySearch({
-      entryId: updatedEntry.id,
-      collection: updatedEntry.collection,
-      slug: updatedEntry.slug,
-      title: updatedEntry.title,
-      seoDescription: updatedEntry.seoDescription,
-      content: updatedEntry.content,
-    });
-  }
+  const entriesToSyncSearch = isSlugChanging
+    ? await db.query.cmsEntryTable.findMany({
+        where: {
+          collection: updatedEntry.collection,
+          slug: updatedEntry.slug,
+        },
+      })
+    : [updatedEntry];
+
+  await Promise.all(
+    entriesToSyncSearch.map((entry) =>
+      syncCmsEntrySearch({
+        entryId: entry.id,
+        collection: entry.collection,
+        slug: entry.slug,
+        title: entry.title,
+        seoDescription: entry.seoDescription,
+        content: entry.content,
+      })
+    )
+  );
 
   await recordCmsEntryVersion({
     existingEntry,
@@ -326,7 +335,6 @@ export async function updateCmsEntry(params: UpdateCmsEntryParams): Promise<CmsE
       slug: slug ?? existingEntry.slug,
       seoDescription: finalSeoDescription ?? existingEntry.seoDescription,
       status: status ?? existingEntry.status,
-      publishedAt: updatedEntry.publishedAt,
       featuredImageId: featuredImageId !== undefined ? featuredImageId : existingEntry.featuredImageId,
     },
   });
@@ -342,10 +350,6 @@ export async function updateCmsEntry(params: UpdateCmsEntryParams): Promise<CmsE
     slug: newSlug,
     alsoPurgeSlugs: [oldSlug],
     warm: updatedEntry?.status === CMS_ENTRY_STATUS.PUBLISHED,
-    publishStateChange: getPublishStateChange({
-      statusBefore: existingEntry.status,
-      statusAfter: updatedEntry.status,
-    }),
   });
 
   await syncCmsPublishSchedule(updatedEntry);
@@ -379,9 +383,6 @@ export async function deleteCmsEntry(params: DeleteCmsEntryParams): Promise<CmsE
       })
     : [existingEntry];
 
-  // The navigation item cascades away with the anchor row, so its page path is read first.
-  const pagePathnames = await getCmsNavigationEntryPaths({ entries: [{ collection: collectionSlug, slug }] });
-
   for (const entry of entriesToDelete) {
     await db.delete(cmsEntryMediaTable).where(eq(cmsEntryMediaTable.entryId, entry.id));
     await db.delete(cmsEntryTable).where(eq(cmsEntryTable.id, entry.id));
@@ -391,14 +392,7 @@ export async function deleteCmsEntry(params: DeleteCmsEntryParams): Promise<CmsE
   }
 
   // Every sibling shares (collection, slug), so one invalidation covers the group.
-  await invalidateDeletedCmsEntry({
-    collectionSlug,
-    slug,
-    pagePathnames,
-    publishStateChange: entriesToDelete
-      .map((entry) => getPublishStateChange({ statusBefore: entry.status, statusAfter: null }))
-      .find((change) => change !== null) ?? null,
-  });
+  await invalidateEntryAndCollection({ collectionSlug, slug });
 
   return existingEntry;
 }
@@ -521,11 +515,10 @@ export async function createCmsEntryTranslation<T extends CollectionsUnion>(
 }
 
 // Loads a non-default translation row together with its canonical (default-locale)
-// source and the source's current hashes. Throws if either row is missing or if `id` is the source.
+// source, throwing if either is missing or if `id` points at the source row itself.
 async function loadTranslationWithSource(id: string): Promise<{
   translationEntry: CmsEntry;
   sourceEntry: CmsEntry;
-  currentHashes: SourceContentHashes;
 }> {
   const db = getDB();
 
@@ -548,13 +541,7 @@ async function loadTranslationWithSource(id: string): Promise<{
     throw new Error(`No default-locale source found for "${translationEntry.slug}"`);
   }
 
-  const currentHashes = computeEntryTranslatableHashes({
-    title: sourceEntry.title,
-    seoDescription: sourceEntry.seoDescription,
-    content: sourceEntry.content,
-  });
-
-  return { translationEntry, sourceEntry, currentHashes };
+  return { translationEntry, sourceEntry };
 }
 
 // Moves only the source-hash snapshot on a translation row — no content change, so
@@ -579,8 +566,13 @@ async function snapshotSourceContentHashes(
 export async function retranslateCmsEntry(params: { id: string }): Promise<CmsEntry | null> {
   const { id } = v.parse(v.object({ id: idField() }), params);
 
-  const { translationEntry, sourceEntry, currentHashes } = await loadTranslationWithSource(id);
+  const { translationEntry, sourceEntry } = await loadTranslationWithSource(id);
 
+  const currentHashes = computeEntryTranslatableHashes({
+    title: sourceEntry.title,
+    seoDescription: sourceEntry.seoDescription,
+    content: sourceEntry.content,
+  });
   const staleFields = computeStaleFields({
     snapshot: translationEntry.sourceContentHashes,
     current: currentHashes,
@@ -608,12 +600,6 @@ export async function retranslateCmsEntry(params: { id: string }): Promise<CmsEn
     only: staleFields,
   });
 
-  // A failed or partial AI run returns source text. Writing it with fresh hashes would mark
-  // untranslated copy as up to date, so leave the row stale and refuse.
-  if (!translated.translated) {
-    throw new ActionError("SERVICE_UNAVAILABLE", RETRANSLATE_UNAVAILABLE_MESSAGE);
-  }
-
   // Overwrite only the drifted fields; keep the existing translation for the rest.
   // Re-snapshot ALL hashes — the row is now aligned with the current source.
   return updateCmsEntry({
@@ -637,7 +623,13 @@ export async function markCmsEntryTranslationReviewed(
 ): Promise<CmsEntry | null> {
   const { id } = v.parse(v.object({ id: idField() }), params);
 
-  const { translationEntry, currentHashes } = await loadTranslationWithSource(id);
+  const { translationEntry, sourceEntry } = await loadTranslationWithSource(id);
+
+  const currentHashes = computeEntryTranslatableHashes({
+    title: sourceEntry.title,
+    seoDescription: sourceEntry.seoDescription,
+    content: sourceEntry.content,
+  });
 
   return snapshotSourceContentHashes(translationEntry.id, currentHashes);
 }

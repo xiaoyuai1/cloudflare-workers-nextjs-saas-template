@@ -16,13 +16,9 @@ const { kvDeleteMock, kvStore } = vi.hoisted(() => ({
 
 vi.mock("server-only", () => ({}));
 
-// Both lookups read D1; the blog collection resolves its path from `previewUrl` alone.
+// The navigation lookup reads D1; the blog collection resolves its path from `previewUrl` alone.
 vi.mock("@/lib/cms/cms-navigation-entry-paths", () => ({
-  getCmsNavigationPagePaths: async () => [],
-}));
-
-vi.mock("@/lib/cms/blog-listing-post-counts", () => ({
-  getBlogListingPostCounts: async () => [],
+  getCmsNavigationEntryPaths: async () => [],
 }));
 
 // Keeps the untraced `tracing` stub, which the purge's span needs.
@@ -41,11 +37,7 @@ vi.mock("cloudflare:workers", async (importOriginal) => ({
   },
 }));
 
-const { purgeCmsPages } = await import("./cms-entry-page-purge");
-const { CMS_INVALIDATION_SCOPES } = await import("./cms-invalidation-scopes");
-
-const BLOG_ENTRIES = [{ collection: BLOG_COLLECTION_SLUG, slug: "launch-notes" }];
-const NO_ENTRY_ROWS = async () => [];
+const { purgeCmsEntryMarkdownPages } = await import("./cms-entry-page-purge");
 
 const BLOG_ENTRY_PATH = cmsConfig.collections[BLOG_COLLECTION_SLUG].previewUrl("launch-notes");
 /** `/blog` for the template: the listing root every affected page sits under. */
@@ -55,7 +47,7 @@ function pageCacheKey(pathname: string): string {
   return `${MARKDOWN_PAGE_CACHE_PREFIX}${MARKDOWN_BUILD_ID}:${pathname}`;
 }
 
-describe("purgeCmsPages, the `.md` half", () => {
+describe("purgeCmsEntryMarkdownPages", () => {
   beforeEach(() => {
     vi.stubGlobal("__MARKDOWN_BUILD_ID__", MARKDOWN_BUILD_ID);
     kvStore.clear();
@@ -86,7 +78,7 @@ describe("purgeCmsPages, the `.md` half", () => {
       kvStore.add(key);
     }
 
-    await purgeCmsPages({ entries: BLOG_ENTRIES, navigationKeys: [], readAllEntryRefs: NO_ENTRY_ROWS, scopes: [] });
+    await purgeCmsEntryMarkdownPages({ entries: [{ collection: BLOG_COLLECTION_SLUG, slug: "launch-notes" }] });
 
     const deleted = kvDeleteMock.mock.calls.map(([key]) => key as string);
     expect(deleted.toSorted()).toEqual(affectedKeys.toSorted());
@@ -98,37 +90,7 @@ describe("purgeCmsPages, the `.md` half", () => {
     kvDeleteMock.mockRejectedValue(new Error("KV unavailable"));
 
     await expect(
-      purgeCmsPages({ entries: BLOG_ENTRIES, navigationKeys: [], readAllEntryRefs: NO_ENTRY_ROWS, scopes: [] }),
-    ).resolves.toBeDefined();
-  });
-
-  // The header sits outside `<main>`, which is all a twin converts, so a header flip keeps them.
-  test("a site header purge deletes no `.md` twin", async () => {
-    kvStore.add(pageCacheKey("/terms"));
-
-    await purgeCmsPages({
-      entries: [],
-      navigationKeys: [],
-      readAllEntryRefs: NO_ENTRY_ROWS,
-      scopes: [CMS_INVALIDATION_SCOPES.SITE_HEADER],
-    });
-
-    expect(kvDeleteMock).not.toHaveBeenCalled();
-  });
-
-  test("a full CMS clear deletes every `.md` twin", async () => {
-    const keys = [pageCacheKey("/terms"), pageCacheKey(BLOG_LISTING_PATH)];
-    for (const key of keys) {
-      kvStore.add(key);
-    }
-
-    await purgeCmsPages({
-      entries: [],
-      navigationKeys: [],
-      readAllEntryRefs: NO_ENTRY_ROWS,
-      scopes: [CMS_INVALIDATION_SCOPES.ALL_CMS],
-    });
-
-    expect(kvDeleteMock.mock.calls.map(([key]) => key as string).toSorted()).toEqual(keys.toSorted());
+      purgeCmsEntryMarkdownPages({ entries: [{ collection: BLOG_COLLECTION_SLUG, slug: "launch-notes" }] }),
+    ).resolves.toBeUndefined();
   });
 });

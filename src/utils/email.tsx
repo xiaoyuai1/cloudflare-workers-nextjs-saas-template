@@ -105,7 +105,14 @@ export async function sendTransactionalEmailNow({
   const { env } = await getCloudflareContext();
   const { emailFrom, emailFromName, emailReplyTo } = await getEmailEnv();
 
-  if (!env.EMAIL) {
+  // Email Sending (`send_email`) needs the Workers Paid plan, so a free-plan fork omits the
+  // EMAIL binding and the generated Env no longer declares it. The structural lookup (not a
+  // hard typed read) keeps this file compiling for both forks while the missing-binding check
+  // below still fails loudly on the paid path where a real send is expected.
+  const email = (env as { EMAIL?: { send: (message: EmailMessageBuilder) => Promise<unknown> } })
+    .EMAIL;
+
+  if (!email) {
     throw new Error("Cloudflare Email Service binding EMAIL is not configured.");
   }
 
@@ -133,7 +140,7 @@ export async function sendTransactionalEmailNow({
     message.replyTo = emailReplyTo;
   }
 
-  await env.EMAIL.send(message);
+  await email.send(message);
 }
 
 // Local delivery for every transactional email. The EMAIL binding is `remote: true`, so a queued
@@ -159,6 +166,14 @@ async function queueTransactionalEmail(payload: EmailSendJobPayload): Promise<vo
   }
 
   const { env } = await getCloudflareContext();
+
+  // Free-plan forks have no EMAIL binding (Email Sending needs Workers Paid). Enqueueing would
+  // only burn the queue's retries on a consumer that can never send, so log and stop here too.
+  if (!("EMAIL" in env) || !env.EMAIL) {
+    logTransactionalEmail(await renderTransactionalEmail(payload));
+
+    return;
+  }
 
   await env.SCHEDULER_QUEUE.send(createScheduledQueueMessage({
     type: SCHEDULED_JOB_TYPES.EMAIL_SEND,

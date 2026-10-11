@@ -1,5 +1,4 @@
 import { describe, expect, test, vi } from "vitest";
-import { CMS_DATA_CACHE_TTL } from "@/constants/data-cache";
 import type { JSONContent } from "@tiptap/core";
 
 import { DEFAULT_LOCALE, LOCALES } from "@/i18n/config";
@@ -108,7 +107,7 @@ describe("blog entry artifacts", () => {
     });
     expect(setCacheScopeMock).toHaveBeenCalledWith({
       tags: ["cms-entry-blog-launch-notes"],
-      ttl: CMS_DATA_CACHE_TTL,
+      ttl: "8 hours",
     });
     expect(artifacts?.html).toContain('id="launch-notes"');
   });

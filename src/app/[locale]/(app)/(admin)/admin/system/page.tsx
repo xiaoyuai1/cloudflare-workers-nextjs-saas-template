@@ -5,7 +5,6 @@ import { Link } from "@/i18n/navigation";
 import { getSystemActionAvailability } from "@/lib/admin/system-actions";
 import { requireAdminOrRedirectHome } from "@/utils/auth-redirect";
 
-import { ZonePurgeMissingAlert } from "@/app/[locale]/(app)/(admin)/admin/_components/zone-purge-missing-alert";
 import { SystemActions } from "./_components/system-actions";
 
 export const metadata: Metadata = {
@@ -34,8 +33,6 @@ export default async function AdminSystemPage() {
             Maintenance tasks for CMS search indexes, data cache, and the CDN caches.
           </p>
         </div>
-
-        {!availability.purgeCloudflareCdnCache && <ZonePurgeMissingAlert />}
 
         <SystemActions availability={availability} />
 

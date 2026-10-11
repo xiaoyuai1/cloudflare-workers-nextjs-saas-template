@@ -5,7 +5,7 @@ import { ActionError } from "@/lib/action-error";
 import { actionClient } from "@/lib/safe-action";
 import { requireAdmin } from "@/utils/auth";
 import {
-  getFreshCmsTags,
+  getCmsTags,
   createCmsTag,
   updateCmsTag,
   deleteCmsTag,
@@ -18,7 +18,6 @@ import {
   updateCmsTagActionSchema,
 } from "@/schemas/cms-tag.schema";
 import { ENABLED_LOCALES } from "@/i18n/config";
-import { withCmsCachePurgeReport } from "@/lib/cms/cms-cache-purge-report";
 import { CMS_TAGS_PAGE_PATH } from "@/lib/blog-routing";
 import { localizedPagePathname } from "@/lib/markdown-pages/page-paths";
 
@@ -47,15 +46,19 @@ export const listCmsTagsAction = actionClient
   .metadata({ actionName: "listCmsTagsAction" })
   .action(async () => {
     await requireAdmin();
-    const tags = await getFreshCmsTags();
+    const tags = await getCmsTags();
     return tags;
   });
 
 export const createCmsTagAction = actionClient
   .metadata({ actionName: "createCmsTagAction" })
   .inputSchema(createCmsTagActionSchema)
-  .action(({ parsedInput: input }) => withCmsCachePurgeReport(async () => {
+  .action(async ({ parsedInput: input }) => {
     const session = await requireAdmin();
+
+    if (!session?.userId) {
+      throw new ActionError("FORBIDDEN", "Not authorized");
+    }
 
     const newTag = await createCmsTag({
       name: input.name,
@@ -68,12 +71,12 @@ export const createCmsTagAction = actionClient
     revalidateCmsTagPaths(newTag.slug);
 
     return newTag;
-  }));
+  });
 
 export const updateCmsTagAction = actionClient
   .metadata({ actionName: "updateCmsTagAction" })
   .inputSchema(updateCmsTagActionSchema)
-  .action(({ parsedInput: input }) => withCmsCachePurgeReport(async () => {
+  .action(async ({ parsedInput: input }) => {
     await requireAdmin();
 
     const updatedTag = await updateCmsTag({
@@ -91,12 +94,12 @@ export const updateCmsTagAction = actionClient
     revalidateCmsTagPaths(updatedTag.slug);
 
     return updatedTag;
-  }));
+  });
 
 export const deleteCmsTagAction = actionClient
   .metadata({ actionName: "deleteCmsTagAction" })
   .inputSchema(cmsTagIdSchema)
-  .action(({ parsedInput: input }) => withCmsCachePurgeReport(async () => {
+  .action(async ({ parsedInput: input }) => {
     await requireAdmin();
 
     const deletedTag = await deleteCmsTag(input.id);
@@ -104,13 +107,17 @@ export const deleteCmsTagAction = actionClient
     revalidateCmsTagPaths(deletedTag?.slug);
 
     return { success: true };
-  }));
+  });
 
 export const createTagTranslationAction = actionClient
   .metadata({ actionName: "createTagTranslationAction" })
   .inputSchema(createCmsTagTranslationActionSchema)
-  .action(({ parsedInput: input }) => withCmsCachePurgeReport(async () => {
+  .action(async ({ parsedInput: input }) => {
     const session = await requireAdmin();
+
+    if (!session?.userId) {
+      throw new ActionError("FORBIDDEN", "Not authorized");
+    }
 
     const newTag = await createCmsTagTranslation({
       slug: input.slug,
@@ -123,4 +130,4 @@ export const createTagTranslationAction = actionClient
     revalidateCmsTagPaths(newTag.slug);
 
     return newTag;
-  }));
+  });
