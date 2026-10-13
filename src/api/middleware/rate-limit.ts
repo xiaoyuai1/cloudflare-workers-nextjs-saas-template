@@ -95,6 +95,9 @@ function getCredentialRateLimitKey(principal: ApiPrincipal): string {
     case "oauth-grant":
       // A token the exchange callback never stamped has no per-grant identity to key on.
       return principal.grantId ?? principal.userId;
+    case "mobile-session":
+      // Per device: one leaked phone session cannot drain the owner's other devices' quota.
+      return `${principal.userId}:${principal.deviceId}`;
   }
 }
 

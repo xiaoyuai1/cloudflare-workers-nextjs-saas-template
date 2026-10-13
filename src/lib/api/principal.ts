@@ -52,10 +52,17 @@ export interface OAuthGrantPrincipal extends ApiPrincipalBase {
   grantId?: string;
 }
 
+// A mobile-app session token (AutoJs6 account module). Account audience, full personal scope
+// catalog: the app speaks for its signed-in user, exactly like a cookie session does on the web.
+export interface MobileSessionPrincipal extends ApiPrincipalBase {
+  kind: "mobile-session";
+  deviceId: string;
+}
+
 // A discriminated union, not one wide shape: `keyId` exists exactly when the credential is a key.
 // There is deliberately no cookie-session variant — a cookie caller never enters the ALS at all,
 // and "no principal in scope" is what the guards below read as unrestricted.
-export type ApiPrincipal = ApiKeyPrincipal | OAuthGrantPrincipal;
+export type ApiPrincipal = ApiKeyPrincipal | OAuthGrantPrincipal | MobileSessionPrincipal;
 
 export function toApiAudience(teamId: string | null | undefined): ApiAudience {
   return teamId ? { type: "team", teamId } : PERSONAL_AUDIENCE;
@@ -101,6 +108,9 @@ export function isApiPrincipal(value: unknown): value is ApiPrincipal {
   }
   if (candidate.kind === "oauth-grant") {
     return typeof candidate.clientId === "string" && !!candidate.clientId;
+  }
+  if (candidate.kind === "mobile-session") {
+    return typeof candidate.deviceId === "string" && !!candidate.deviceId;
   }
 
   return false;

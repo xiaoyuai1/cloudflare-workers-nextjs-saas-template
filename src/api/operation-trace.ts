@@ -26,6 +26,7 @@ const UNMAPPED_ERROR_STATUS = 500;
 const PRINCIPAL_KIND_VALUES = {
   "api-key": "api_key",
   "oauth-grant": "oauth_grant",
+  "mobile-session": "mobile_session",
 } as const satisfies Record<ApiPrincipal["kind"], string>;
 
 // Hono serves the API outside vinext, so no route span exists. This span wraps the guard and the

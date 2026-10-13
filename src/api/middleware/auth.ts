@@ -4,13 +4,22 @@ import type { Context, MiddlewareHandler } from "hono";
 
 import { enforceAnonRateLimit } from "@/api/middleware/rate-limit";
 import type { ApiEnv } from "@/api/types";
-import { OAUTH_PROTECTED_RESOURCE_PATH } from "@/constants";
+import { API_KEY_PREFIX_LIVE, OAUTH_PROTECTED_RESOURCE_PATH } from "@/constants";
 import { ActionError } from "@/lib/action-error";
 import { actionErrorToProblem, toProblemResponse } from "@/lib/api/errors";
-import { getBearerPrincipal, runWithPrincipal, type ApiPrincipal } from "@/lib/api/principal";
+import {
+  getBearerPrincipal,
+  PERSONAL_AUDIENCE,
+  runWithPrincipal,
+  type ApiPrincipal,
+} from "@/lib/api/principal";
+import { API_SCOPE_NAMES } from "@/lib/api/scopes";
 import { rateLimitHeaders } from "@/lib/api/rate-limit-headers";
 import { principalFromBearerProps } from "@/lib/oauth/bearer-props";
 import { looksLikeApiKey } from "@/utils/api-key-format";
+import { isBanned } from "@/lib/account/ban";
+import { verifyMsessionToken } from "@/utils/msession";
+import { loadPrincipalIdentity, reviveUserDates } from "@/utils/kv-principal-cache";
 import { getApiKeyPrincipal } from "@/utils/kv-api-key";
 import { withSpan } from "@/utils/trace";
 import type { RateLimitSnapshot } from "@/utils/with-rate-limit";
@@ -130,6 +139,41 @@ async function resolveApiAuth(c: Context<ApiEnv>): Promise<ApiAuthResult> {
         quota,
       }),
     };
+  }
+
+  // Mobile-app sessions (AutoJs6 account module) before the API-key sniff: an msession token is
+  // plain base64url with no `saas_` prefix, so `looksLikeApiKey` would misclassify it as garbage.
+  // The msession token format is the same 48-byte base64url the web session uses, which no
+  // API-key prefix can collide with (those all start `saas_`).
+  if (!token.startsWith(API_KEY_PREFIX_LIVE)) {
+    const record = await verifyMsessionToken(token);
+
+    if (record) {
+      const identity = await loadPrincipalIdentity(record.userId);
+
+      if (identity && !isBanned(identity.user)) {
+        return {
+          outcome: AUTH_OUTCOMES.HEADER,
+          principal: {
+            kind: "mobile-session",
+            userId: record.userId,
+            user: reviveUserDates(identity.user),
+            teams: identity.teams,
+            scopes: API_SCOPE_NAMES,
+            audience: PERSONAL_AUDIENCE,
+            deviceId: record.deviceId,
+          },
+        };
+      }
+
+      const quota = await enforceAnonRateLimit(c);
+      return {
+        outcome: AUTH_OUTCOMES.INVALID,
+        response: unauthorized({ c, detail: INVALID_CREDENTIAL_DETAIL, tokenPresented: true, quota }),
+      };
+    }
+    // Not an msession either — fall through to the API-key path, whose refusal covers
+    // "not a valid credential of any kind we issue".
   }
 
   // Cheap prefix + checksum sniff: a garbage token never reaches D1 or KV.

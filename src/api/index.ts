@@ -11,6 +11,7 @@ import { credentialRoutes } from "@/api/routes/credential";
 import { invitationRoutes } from "@/api/routes/invitations";
 import { memberRoutes } from "@/api/routes/members";
 import { meRoutes } from "@/api/routes/me";
+import { mobileAuthRoutes } from "@/api/routes/mobile-auth";
 import { teamRoutes } from "@/api/routes/teams";
 import type { ApiApp, ApiEnv } from "@/api/types";
 import { API_OPENAPI_SPEC_METHODS, API_V1_BASE_PATH } from "@/constants";
@@ -30,7 +31,11 @@ const OPENAPI_ROUTE = "/openapi.json";
 // ---------------------------------------------------------------------------
 // oxlint-disable project/no-unused-module-exports -- Template extension point.
 // fallow-ignore-next-line unused-export -- Intentionally empty until a fork mounts its own routes.
-export function registerCustomRoutes(__app: ApiApp): void {}
+export function registerCustomRoutes(app: ApiApp): void {
+  // AutoJs6 account module (P1): mobile auth + bindings. Register/login/logout are public
+  // (`scope: null`), the rest require the Bearer msession; see src/api/routes/mobile-auth.ts.
+  app.route("/", mobileAuthRoutes);
+}
 // oxlint-enable project/no-unused-module-exports
 
 function createApiApp(): ApiApp {

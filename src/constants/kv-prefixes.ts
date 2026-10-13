@@ -16,6 +16,9 @@ export const APP_KV_PREFIXES = {
   vinextCache: VINEXT_CACHE_PREFIX,
   markdownPage: MARKDOWN_PAGE_CACHE_PREFIX,
   session: "session:",
+  // Mobile-app sessions (AutoJs6 account module): `msession:<sha256(token)>` → MsessionRecord.
+  // Keyed by token hash, so `list({ prefix })` walks every device's record to revoke by user.
+  msession: "msession:",
   rateLimit: "rate-limit:",
   webauthnChallenge: "webauthn-challenge:",
   passwordReset: "password-reset:",

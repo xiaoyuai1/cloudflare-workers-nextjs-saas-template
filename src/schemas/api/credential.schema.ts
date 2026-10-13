@@ -6,7 +6,7 @@ import { v } from "@/lib/validation";
 
 export const credentialSchema = v.object({
   /** How the credential was issued. */
-  kind: v.picklist(["api-key", "oauth-grant"]),
+  kind: v.picklist(["api-key", "oauth-grant", "mobile-session"]),
   /** "personal" acts for the whole account; "team" is confined to one team. */
   audience: v.picklist(["personal", "team"]),
   /** The team a team credential is confined to, id only — name and slug stay behind the
