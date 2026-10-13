@@ -41,6 +41,11 @@ export const userTable = sqliteTable("user", {
   lastName: text({
     length: 255,
   }),
+  // Display name shown in the mobile app account page (AutoJs6 account module). Null = fall
+  // back to firstName/lastName/email local-part. Nullable/unconstrained: added to a populated table.
+  nickname: text({
+    length: 255,
+  }),
   email: text({
     length: 255,
   }),
@@ -173,6 +178,33 @@ export const passKeyCredentialTable = sqliteTable("passkey_credential", {
 }, (table) => ([
   index('user_id_idx').on(table.userId),
   uniqueIndex('passkey_credential_credentialId_unique').on(table.credentialId),
+]));
+
+// One external identity (email, GitHub, DingTalk, WeChat...) linked to a user account.
+// design reference: sub2api (Wei-Shaw/sub2api, LGPL-3.0) docs/PAYMENT.md — auth_identities model.
+// A user may hold several rows; an identity row belongs to exactly one user. Lookups by
+// (providerType, providerKey, providerSubject) decide "which user is this OAuth subject".
+export const authIdentityTable = sqliteTable("auth_identity", {
+  ...commonColumns,
+  // Runtime default instead of commonColumns' SQL DEFAULT: new tables must not introduce
+  // database-level defaults (see CLAUDE.md D1 schema-change safety).
+  updateCounter: integer().$defaultFn(() => 0).$onUpdate(() => sql`updateCounter + 1`),
+  id: text().primaryKey().$defaultFn(() => `aidn_${createRandomId()}`).notNull(),
+  userId: text().notNull().references(() => userTable.id),
+  // 'email' | 'github' | 'wechat' | 'dingtalk'. Plain text, not an enum: a SQLite CHECK
+  // constraint would force a table rebuild to extend the set later.
+  providerType: text({ length: 50 }).notNull(),
+  // Tenant discriminator within a provider (reserved; '' for now).
+  providerKey: text({ length: 255 }).notNull(),
+  // GitHub numeric user id / WeChat unionid / DingTalk unionId. Email: lowercase address.
+  providerSubject: text({ length: 255 }).notNull(),
+  // When the provider confirmed this identity (email verification, OAuth trust). Null = unverified.
+  verifiedAt: integer({ mode: "timestamp" }),
+  // JSON: nickname / avatar / openid etc. as returned by the provider at bind time.
+  metadata: text({ length: 2000 }),
+}, (table) => ([
+  uniqueIndex('auth_identity_provider_unique').on(table.providerType, table.providerKey, table.providerSubject),
+  index('auth_identity_user_idx').on(table.userId),
 ]));
 
 // Team table
@@ -599,6 +631,7 @@ export const cmsEntryTagTable = sqliteTable("cms_entry_tag", {
 
 const relationSchema = {
   apiKeyTable,
+  authIdentityTable,
   bannedEmailTable,
   cmsNavigationItemTable,
   cmsNavigationRedirectTable,
@@ -842,6 +875,10 @@ export const relations = defineRelations(relationSchema, (r) => ({
       from: r.userTable.id,
       to: r.passKeyCredentialTable.userId,
     }),
+    authIdentities: r.many.authIdentityTable({
+      from: r.userTable.id,
+      to: r.authIdentityTable.userId,
+    }),
     ownedOAuthApps: r.many.oauthAppTable({
       from: r.userTable.id,
       to: r.oauthAppTable.ownerUserId,
@@ -898,6 +935,13 @@ export const relations = defineRelations(relationSchema, (r) => ({
   passKeyCredentialTable: {
     user: r.one.userTable({
       from: r.passKeyCredentialTable.userId,
+      to: r.userTable.id,
+      optional: false,
+    }),
+  },
+  authIdentityTable: {
+    user: r.one.userTable({
+      from: r.authIdentityTable.userId,
       to: r.userTable.id,
       optional: false,
     }),
