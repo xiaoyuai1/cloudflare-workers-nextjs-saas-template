@@ -120,13 +120,15 @@
   --color-foreground: var(--foreground);
   --color-edge: var(--edge);
   --color-edge-foreground: var(--edge-foreground);
-  /* System font stacks only — no web fonts are loaded. */
+  /* System font stacks only — no web fonts are loaded. CJK fallbacks for zh. */
   --font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
-    "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji",
+    "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "PingFang SC",
+    "Hiragino Sans GB", "Microsoft YaHei", "Apple Color Emoji",
     "Segoe UI Emoji";
   /* Display reuses the native UI font but prefers geometric faces where installed. */
   --font-display: "Avenir Next", "Segoe UI", system-ui, -apple-system,
-    BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;
+    BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif, "PingFang SC",
+    "Hiragino Sans GB", "Microsoft YaHei";
   --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Monaco, Consolas,
     "Liberation Mono", "Courier New", monospace;
   --color-sidebar-ring: var(--sidebar-ring);

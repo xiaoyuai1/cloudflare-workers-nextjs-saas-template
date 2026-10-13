@@ -1,0 +1,1429 @@
+{
+  "Client": {
+    "Common": {
+      "cancel": "取消",
+      "copied": "已复制",
+      "copyFailed": "无法复制到剪贴板"
+    },
+    "ApiScopes": {
+      "profile:read": "读取你的账户资料、会话和偏好设置。",
+      "profile:write": "更新你的账户资料并撤销你的会话。",
+      "teams:read": "列出你所属的团队并读取其详情。",
+      "teams:write": "创建团队并更改团队详情。",
+      "members:read": "列出你团队的成员。",
+      "members:write": "更改和移除你团队的成员。",
+      "invites:write": "发送和撤销你团队的邀请。",
+      "billing:read": "读取你团队的订阅和账单状态。",
+      "api-keys:read": "列出你账户上的 API 密钥及其最近使用时间。",
+      "api-keys:write": "创建和撤销你账户上的 API 密钥。"
+    },
+    "ApiScopeSummary": {
+      "fullAccess": "完全访问权限",
+      "readOnlyAccess": "对 {resources} 的只读访问权限",
+      "partialAccess": "对 {resources} 的访问权限",
+      "noAccess": "无访问权限",
+      "scopeCount": "{count, plural, one {# 个范围} other {# 个范围}}",
+      "resources": {
+        "profile": "你的资料",
+        "teams": "团队",
+        "members": "成员",
+        "invites": "邀请",
+        "billing": "账单",
+        "api-keys": "API 密钥"
+      }
+    },
+    "LocaleSwitcher": {
+      "change": "更改语言"
+    },
+    "Nav": {
+      "home": "首页",
+      "blog": "博客",
+      "docs": "文档",
+      "settings": "设置",
+      "dashboard": "控制台",
+      "adminPanel": "管理面板",
+      "signIn": "登录",
+      "openMenu": "打开菜单",
+      "loadingMenu": "正在加载菜单"
+    },
+    "Auth": {
+      "Common": {
+        "emailLabel": "邮箱",
+        "emailPlaceholder": "邮箱地址",
+        "passwordPlaceholder": "密码",
+        "or": "或",
+        "signIn": "登录",
+        "signInWithGoogle": "使用 Google 登录",
+        "signUpWithGoogle": "使用 Google 注册",
+        "backToSignIn": "返回登录",
+        "backToLogin": "返回登录",
+        "genericError": "出错了",
+        "errorCaptcha": "请完成人机验证",
+        "errorEmailAlreadyVerified": "邮箱已验证",
+        "errorCreateUser": "创建用户失败"
+      },
+      "SignIn": {
+        "meta": {
+          "title": "登录",
+          "description": "登录您的账户"
+        },
+        "heading": "登录您的账户",
+        "noAccountPrompt": "或",
+        "createAccountLink": "创建新账户",
+        "signInWithPasskey": "使用通行密钥登录",
+        "authenticatingPasskey": "正在验证...",
+        "signInWithPassword": "使用密码登录",
+        "signingIn": "正在登录...",
+        "forgotPassword": "忘记密码？",
+        "toastAuthenticatingPasskey": "正在通过通行密钥验证...",
+        "toastPasskeyOptionsError": "获取身份验证选项失败",
+        "toastPasskeyAuthError": "身份验证失败",
+        "toastAuthSuccess": "身份验证成功",
+        "toastSigningIn": "正在为您登录...",
+        "toastSignInSuccess": "登录成功",
+        "errorInvalidCredentials": "邮箱或密码不正确",
+        "errorUseGoogle": "请改用您的 Google 账户登录。",
+        "errorUsePasskey": "请改用通行密钥登录。",
+        "errorAccountSuspended": "该账户已被停用，请联系支持团队寻求帮助。"
+      },
+      "SignUp": {
+        "meta": {
+          "title": "注册",
+          "description": "创建新账户"
+        },
+        "heading": "创建您的账户",
+        "hasAccountPrompt": "已有账户？",
+        "signInLink": "登录",
+        "signUpWithPasskey": "使用通行密钥注册",
+        "createAccountWithPassword": "使用密码创建账户",
+        "firstNamePlaceholder": "名字",
+        "lastNamePlaceholder": "姓氏",
+        "passkeyDialogTitle": "使用通行密钥注册",
+        "passkeyContinue": "继续",
+        "passkeyRegistering": "正在注册...",
+        "passkeyHelpText": "点击继续后，浏览器将提示您创建并保存通行密钥。此后您即可在无需密码的情况下安全登录。",
+        "agreementPrefix": "注册即表示您同意我们的",
+        "termsOfService": "服务条款",
+        "and": "和",
+        "privacyPolicy": "隐私政策",
+        "toastCreatingAccount": "正在创建您的账户...",
+        "toastAccountCreated": "账户创建成功",
+        "toastStartingPasskeyRegistration": "正在开始通行密钥注册...",
+        "toastPasskeyRegistrationFailed": "无法开始通行密钥注册",
+        "toastPasskeyRegistrationError": "注册通行密钥失败",
+        "errorEmailTaken": "该邮箱已被占用",
+        "errorCreateSession": "注册后创建会话失败",
+        "errorAccountExists": "此邮箱已存在对应账户",
+        "errorInvalidRegistrationSession": "注册会话无效",
+        "errorRegisterFailed": "注册通行密钥失败",
+        "errorEmailNotAllowed": "此邮箱地址无法用于注册。"
+      },
+      "ForgotPassword": {
+        "meta": {
+          "title": "忘记密码",
+          "description": "重置您的密码"
+        },
+        "changePasswordTitle": "修改密码",
+        "forgotPasswordTitle": "忘记密码",
+        "description": "输入您的邮箱地址，我们将向您发送重置密码的说明。",
+        "sendInstructions": "发送重置说明",
+        "backToSettings": "返回设置",
+        "checkEmailTitle": "请查看您的邮箱",
+        "checkEmailDescription": "如果该邮箱存在对应账户，我们已向您发送重置密码的说明。",
+        "toastSending": "正在发送重置说明...",
+        "toastSent": "重置说明已发送"
+      },
+      "ResetPassword": {
+        "meta": {
+          "title": "重置密码",
+          "description": "为您的账户设置新密码"
+        },
+        "title": "重置密码",
+        "description": "请在下方输入您的新密码。",
+        "newPasswordLabel": "新密码",
+        "confirmPasswordLabel": "确认密码",
+        "submit": "重置密码",
+        "successTitle": "密码重置成功",
+        "successDescription": "您的密码已重置，现在可以使用新密码登录。",
+        "goToLogin": "前往登录",
+        "toastResetting": "正在重置密码...",
+        "toastResetSuccess": "密码重置成功",
+        "invalidLinkTitle": "重置链接无效",
+        "invalidLinkDescription": "此密码重置链接无效或已过期，请重新申请。",
+        "requestNewLink": "申请新的重置链接",
+        "errorInvalidToken": "重置令牌无效或已过期",
+        "errorTokenExpired": "重置令牌已过期"
+      },
+      "VerifyEmail": {
+        "meta": {
+          "title": "验证邮箱",
+          "description": "验证您的邮箱地址"
+        },
+        "verifyingTitle": "正在验证邮箱",
+        "verifyingDescription": "请稍候，我们正在验证您的邮箱地址...",
+        "failedTitle": "验证失败",
+        "failedDescription": "邮箱验证失败",
+        "invalidLinkTitle": "验证链接无效",
+        "invalidLinkDescription": "验证链接无效，请重新申请验证邮件。",
+        "notFoundTitle": "验证链接无效",
+        "notFoundDescription": "您点击的验证链接无效或已过期。可能的原因包括：",
+        "notFoundReasonExpired": "链接已过期（验证链接的有效期为 24 小时）",
+        "notFoundReasonAlreadyVerified": "您已验证过邮箱",
+        "notFoundReasonModified": "链接已被修改或不完整",
+        "goToHome": "前往首页",
+        "toastVerifying": "正在验证您的邮箱...",
+        "toastVerifySuccess": "邮箱验证成功",
+        "toastVerifyFailed": "邮箱验证失败",
+        "toastInvalidToken": "验证令牌无效",
+        "errorTokenNotFound": "未找到验证令牌或已过期"
+      },
+      "EmailVerificationDialog": {
+        "title": "验证您的邮箱",
+        "description": "请验证您的邮箱地址以使用所有功能。我们已向 {email} 发送了验证链接。验证链接将在 {hours, plural, =1 {1 小时} other {# 小时}}后过期。",
+        "devModeTitle": "开发模式",
+        "devModeDescription": "您可以在控制台中找到验证链接。",
+        "toastSending": "正在发送验证邮件...",
+        "toastSent": "验证邮件已发送",
+        "toastCloseWarning": "请先验证邮箱再继续",
+        "sending": "正在发送...",
+        "cooldown": "请等待 1 分钟后再重新发送",
+        "resend": "重新发送验证邮件"
+      },
+      "TeamInvite": {
+        "meta": {
+          "title": "接受团队邀请",
+          "description": "接受加入团队的邀请"
+        },
+        "acceptingTitle": "正在接受邀请",
+        "acceptingDescription": "请稍候，我们正在处理您的团队邀请...",
+        "errorTitle": "邀请错误",
+        "errorDescriptionFallback": "处理邀请失败",
+        "errorAlreadyMember": "您已经是该团队的成员。",
+        "errorTeamLimitReached": "您已达到可加入团队的数量上限。",
+        "errorExpiredOrRevoked": "邀请可能已过期或已被撤销。",
+        "invalidLinkTitle": "邀请链接无效",
+        "invalidLinkDescription": "邀请链接无效或已过期。",
+        "goToDashboard": "前往控制台",
+        "notFoundTitle": "未找到邀请",
+        "notFoundDescription": "您要查找的团队邀请不存在或已过期。",
+        "notFoundReasonsIntro": "可能的原因包括：",
+        "notFoundReasonIncorrectUrl": "邀请 URL 不正确",
+        "notFoundReasonRevoked": "邀请已被团队管理员撤销",
+        "notFoundReasonExpired": "邀请已过期",
+        "toastProcessing": "正在处理您的邀请...",
+        "toastAcceptError": "接受团队邀请失败",
+        "toastAcceptSuccess": "您已成功加入团队！",
+        "toastInvalidToken": "邀请令牌无效",
+        "errorUnexpected": "接受邀请时发生了意外错误"
+      },
+      "GoogleCallback": {
+        "meta": {
+          "title": "使用 Google 登录",
+          "description": "完成 Google 登录"
+        },
+        "signingInTitle": "正在使用 Google 登录",
+        "signingInDescription": "请稍候，我们正在完成您的登录...",
+        "failedTitle": "登录失败",
+        "failedDescriptionFallback": "使用 Google 登录失败",
+        "invalidCallbackTitle": "回调无效",
+        "invalidCallbackDescription": "登录回调无效或已过期，请重新尝试登录。",
+        "toastSigningIn": "正在使用 Google 为您登录...",
+        "toastSignInSuccess": "登录成功",
+        "toastInvalidParams": "回调参数无效",
+        "errorNotEnabled": "Google SSO 未启用",
+        "errorMissingCookies": "缺少所需的 Cookie",
+        "errorInvalidState": "state 参数无效",
+        "errorInvalidCode": "授权码无效",
+        "errorInvalidIdToken": "Google 登录令牌无效"
+      }
+    },
+    "Docs": {
+      "meta": {
+        "title": "文档",
+        "description": "设置、构建和部署本应用的指南与参考。",
+        "groupDescriptionWithPreview": "{group} 文档：{previews}。",
+        "groupDescription": "浏览 {group} 中的文档。",
+        "pageDescription": "{title} 的文档",
+        "andMore": "，以及更多"
+      },
+      "Navigation": {
+        "heading": "文档",
+        "navAriaLabel": "文档导航",
+        "searchButton": "搜索文档",
+        "browseDocs": "浏览文档",
+        "apiSection": "API 与智能体",
+        "machineSection": "面向机器",
+        "llmsTxt": "llms.txt",
+        "openApiDocument": "OpenAPI 文档",
+        "apiReference": "API 参考",
+        "apiErrors": "错误代码",
+        "mcpGuide": "面向 AI 智能体的 MCP",
+        "authGuide": "API 身份验证"
+      },
+      "ApiReference": {
+        "title": "API 参考",
+        "description": "公共 REST API 的每个端点，均由服务器用于校验的同一批 schema 生成。请使用设置中的 API 密钥或 OAuth 访问令牌进行身份验证。",
+        "agentGuidance": "AI 智能体：本页的 Markdown 版本位于相同路径、以 .md 为后缀，列出了可直接进行 REST 调用的端点。请使用 OpenAPI 文档进行工具生成、客户端生成和精确的 schema 校验。当您的客户端支持时，请使用 {mcpPath} 处的 MCP。",
+        "oauthFlow": "OAuth 2.1 使用带 PKCE 的授权码流程。将用户引导至 {authorizationPath}，然后在 {tokenPath} 兑换授权码。",
+        "wireFormat": "在 Authorization: Bearer TOKEN 中发送 API 密钥或 OAuth 访问令牌。请求体使用 {jsonContentType}。错误使用 {problemJsonContentType}。请根据 code 分支判断，并在下一步操作前阅读 detail。",
+        "rateLimit": "经过身份验证的 API 请求，每个凭据每 {windowInSeconds} 秒最多 {limit} 次请求。每个响应都带有 RateLimit-Limit、RateLimit-Remaining 和 RateLimit-Reset（窗口重置前的秒数）；429 响应还包含 retry-after。",
+        "markdownLink": "打开 Markdown 版 API 参考",
+        "specLink": "打开 OpenAPI 文档",
+        "authLink": "身份验证的工作原理",
+        "errorsLink": "错误代码",
+        "mcpLink": "通过 MCP 连接 AI 智能体",
+        "baseUrlLabel": "基础 URL",
+        "copyBaseUrl": "复制基础 URL",
+        "endpointsLabel": "端点",
+        "searchPlaceholder": "筛选端点、字段和范围...",
+        "clearFilters": "清除筛选",
+        "allMethods": "全部",
+        "resultCount": "共 {total} 个端点，显示 {visible} 个",
+        "noResults": "没有端点匹配该筛选条件。",
+        "scopeLabel": "范围",
+        "anyScopeLabel": "任意凭据",
+        "anyScopeDescription": "此端点需要凭据，但不要求特定范围。",
+        "mcpToolLabel": "MCP 工具",
+        "operationIdLabel": "操作",
+        "parametersLabel": "参数",
+        "requestBodyLabel": "请求体",
+        "requestLabel": "请求",
+        "responseLabel": "响应",
+        "errorResponsesLabel": "错误响应",
+        "errorResponsesHint": "每个失败都是一个 RFC 9457 problem 文档，其 <errors>code</errors> 稳定且不做翻译。",
+        "expandLabel": "展开",
+        "exampleLabel": "示例",
+        "copyExample": "复制示例载荷",
+        "copyRequest": "复制请求",
+        "anchorLabel": "指向 {operation} 的链接",
+        "required": "必填",
+        "optional": "可选",
+        "nullable": "可为 null",
+        "meta": {
+          "title": "API 参考",
+          "description": "浏览公共 REST API：端点、范围、请求和响应 schema，以及错误代码。"
+        }
+      },
+      "ApiErrors": {
+        "title": "API 错误代码",
+        "description": "公共 API 的每个失败都是一个 RFC 9457 problem 文档。其 code 成员稳定且不做翻译，因此请根据 code 而非人类可读的 detail 进行分支判断。",
+        "apiReferenceLink": "返回 API 参考",
+        "shapeTitle": "problem 文档",
+        "shapeBody": "响应使用 application/problem+json 内容类型，并携带 type、title、status、code 和 detail。type 成员链接回本页并锚定在对应 code 上。detail 成员说明调用被拒绝的具体原因——例如席位套餐已满、角色 id 未知——因此在决定下一步怎么做时应阅读它，而 code 仍是用于分支判断的依据。当边缘节点提供 ray id 时，它会以 requestId 回显，这是提交支持请求时应引用的值；校验失败还会附加一个 errors 数组，每个被拒绝的值对应一个条目。",
+        "codesTitle": "代码",
+        "codesBody": "HTTP 状态由 code 推导得出，因此客户端可以依赖其中任意一个。遇到无法识别的 code 时，请将其视为服务器错误。",
+        "columnCode": "代码",
+        "columnStatus": "HTTP 状态",
+        "columnMeaning": "含义",
+        "codes": {
+          "INPUT_PARSE_ERROR": "请求体、查询或路径参数未通过 schema 校验。errors 数组会定位每个被拒绝的值，并指出其违反的约束。",
+          "BAD_REQUEST": "请求已被理解，但在当前上下文中无效。",
+          "NOT_AUTHORIZED": "未提供凭据，或凭据格式错误、已过期或已被撤销。WWW-Authenticate 头指向 OAuth 客户端启动连接流程所需的资源元数据。",
+          "FORBIDDEN": "凭据有效，但缺少所需范围；或是团队范围的密钥却被用于其所属团队之外或账户级操作；或是其所有者缺少此操作所需的团队权限；或是套餐限制（例如团队的席位数）将其阻止。detail 会说明具体原因。",
+          "NOT_FOUND": "所请求的资源不存在，或对此凭据不可见。",
+          "CONFLICT": "请求与资源的当前状态冲突。",
+          "PRECONDITION_FAILED": "操作的一项规则未满足——例如套餐限制，或邀请已被使用。",
+          "RATE_LIMITED": "此凭据或 IP 地址的请求过多。经过身份验证的凭据每 {windowInSeconds} 秒允许 {limit} 次请求；失败的身份验证尝试使用独立的按 IP 限制。请等待 retry-after 中给出的秒数。",
+          "INTERNAL_SERVER_ERROR": "服务器上发生了故障。细节被有意省略；请重试，如果持续出现请引用 requestId。"
+        },
+        "fieldsTitle": "字段错误",
+        "fieldsBody": "INPUT_PARSE_ERROR 会携带一个 errors 数组，每个被拒绝的值对应一个条目。每个条目会定位该值并说明其问题所在：in 指出它来自请求的哪个部分，使用的词汇与 OpenAPI 参数相同（body、query、path、header、cookie）；pointer 是 RFC 6901 JSON Pointer，因此 /scopes/1 寻址第二个元素，空字符串寻址整个载荷；code 是来自下方表格的稳定且不翻译的标识符；当 code 带有约束时，params 会携带被违反的约束，例如 {\"min\": 2}。代码描述的是失败的形态而非任何面向用户的文案，因此可以放心地据此分支判断。",
+        "fieldCodes": {
+          "required": "缺少该值。请发送该成员，或在无法提供前省略该请求。",
+          "invalid_type": "该值的类型错误。params.expected 会指出此操作文档中声明的 JSON Schema 类型。",
+          "invalid_value": "该值类型正确，但不是此操作接受的值——超出了枚举范围，或被此操作特有的规则拒绝。OpenAPI 文档列出了允许的值。",
+          "invalid_format": "该值不符合成员要求的格式。params.format 会指出该格式，例如 email。",
+          "min_length": "字符串或数组的长度低于允许的最小值。params.min 是最小值。",
+          "max_length": "字符串或数组的长度超过了允许的最大值。params.max 是最大值。",
+          "min_value": "数值低于允许的范围。params.min 是最小值。",
+          "max_value": "数值高于允许的范围。params.max 是最大值。"
+        },
+        "retryTitle": "安全重试",
+        "retryBody": "429 和 5xx 响应值得采用退避策略重试，并在存在 retry-after 时遵循它。更好的做法是根据每个响应都携带的 RateLimit-Remaining 和 RateLimit-Reset 控制节奏，在达到限制前就放慢速度。其他 4xx 代码在原样重发时会再次失败，需要更换请求、更换凭据，或先取得凭据尚未持有的范围。",
+        "meta": {
+          "title": "API 错误代码",
+          "description": "公共 REST API 和 MCP 服务器返回的稳定错误代码，及其 HTTP 状态与各自的含义。"
+        }
+      },
+      "Auth": {
+        "title": "身份验证（API 密钥与 OAuth）",
+        "description": "REST API 和 MCP 服务器接受两种 bearer 凭据：您在设置中创建的 API 密钥，或应用在您批准后获得的 OAuth 2.1 访问令牌。两者都会解析到一个账户，携带一组范围，并在每次请求时对照团队权限重新校验。",
+        "apiReferenceLink": "浏览 API 参考",
+        "mcpLink": "通过 MCP 连接 AI 智能体",
+        "keysTitle": "API 密钥",
+        "keysBody": "在“设置”下创建密钥，选择它可以使用的范围，并可选择为其设置过期日期。密钥仅在创建时显示一次，系统只保留其末尾几位字符，因此密钥丢失后只能替换而不能找回。请以 Authorization bearer 头的形式发送。密钥带有可识别的前缀和校验和，这让密钥扫描器能够归因泄露的密钥，也让服务器无需查询数据库即可拒绝格式错误的密钥。",
+        "teamKeysTitle": "团队密钥",
+        "teamKeysBody": "密钥可以属于团队而非您个人，由团队设置中允许管理 API 密钥的成员创建。团队密钥仅限于该团队：它可以读取和修改该团队、其成员、其邀请及其账单，而所有其他团队都会被 403 拒绝。它也无法触达账户级操作——账户资料、登录会话、创建团队或管理 API 密钥——这些操作需要个人密钥。密钥也绝不会授予其所有者本不具备的权限：团队权限在每次请求时都会重新评估，因此其所有者失去访问权的那一刻，密钥也随之失去访问权。",
+        "oauthTitle": "面向应用和智能体的 OAuth",
+        "oauthBody": "第三方应用和智能体客户端使用带 PKCE 的 OAuth 2.1 授权码流程。客户端发现各端点后，将您引导至一个授权页面，其中确切列出了它所请求的内容；您批准后，客户端会收到访问令牌和刷新令牌。受信任的集成应使用稳定的 Client ID Metadata Document 或由运营方签发的客户端 ID。开放动态注册仍作为兼容性后备方案保留；每个生成的客户端 ID 都会被单独审核，且初始状态为未验证。",
+        "scopesTitle": "范围",
+        "scopesBody": "范围是粗粒度的资源级授权。它们只会收窄凭据所有者本已拥有的能力——绝不会新增权限——并且同一份目录同时驱动 API 密钥、授权页面和 OpenAPI 安全方案。",
+        "revocationTitle": "撤销访问",
+        "revocationBody": "在“设置 → API & MCP”下撤销密钥或应用的访问；撤销授权还会销毁其下签发的所有令牌。凭据会被短暂缓存以保持请求快速，这意味着撤销在执行处立即生效，并在约一分钟后传播到网络的其余部分。",
+        "limitsTitle": "速率限制与错误",
+        "limitsBody": "经过身份验证的 REST 请求和 MCP 工具调用共享每个凭据每 {windowInSeconds} 秒 {limit} 次请求的限制。失败的身份验证尝试按 IP 地址单独限制；超出任一限制都会返回 429 并附带 retry-after 头。每个 REST 响应都会通过 RateLimit-Limit、RateLimit-Remaining 和 RateLimit-Reset 说明其计入的配额桶，因此客户端可以在被拒绝之前控制自身节奏。每个失败都是一个 RFC 9457 problem 文档，其 code 成员是稳定的标识符而非翻译后的文字，因此脚本和模型可以据此分支判断。",
+        "meta": {
+          "title": "身份验证（API 密钥与 OAuth）",
+          "description": "如何使用 API 密钥或 OAuth 2.1 访问令牌对公共 REST API 和 MCP 服务器进行身份验证，以及范围的含义。"
+        }
+      },
+      "Mcp": {
+        "title": "连接 AI 智能体（MCP）",
+        "description": "公共 API 同时也是一个远程 MCP 服务器，因此任何兼容的智能体客户端都可以将它作为一组工具使用。每个 REST 操作都会成为一个工具，由本站发布的同一份 OpenAPI 文档派生。",
+        "apiReferenceLink": "浏览 REST API 参考",
+        "oauthTitle": "选项 1：使用 OAuth 登录",
+        "oauthBody": "将端点 URL 粘贴到客户端中，它会发现授权服务器并在您的浏览器中打开授权页面。具有稳定元数据文档身份的客户端会直接使用它；其他兼容的客户端会动态注册作为后备。您只需批准一次所请求的范围，之后可以在“设置 → API & MCP”下撤销授权。对于没有 bearer 令牌字段的托管助手，OAuth 是唯一的选择。",
+        "apiKeyTitle": "选项 2：发送 API 密钥",
+        "apiKeyBody": "在您的账户设置中创建密钥，只授予智能体所需的范围，并让客户端以 Authorization bearer 头的形式发送。密钥仅在创建时显示一次。命令行和编辑器客户端支持这种方式；它无需浏览器往返，因此对脚本和 CI 十分方便。",
+        "clientsTitle": "各客户端的设置",
+        "toolsTitle": "智能体可以看到哪些工具",
+        "toolsBody": "工具列表会按凭据过滤：密钥或授权未持有其范围的操作永远不会被通告，因此智能体甚至无法尝试它。团队权限会在每次调用时重新检查，因此撤销某人的成员资格也会同时移除其智能体的访问权。失败的调用会返回 API 的稳定错误代码而非翻译后的文字，这正是模型能够对缺失范围或速率限制作出反应的原因。",
+        "authLink": "身份验证的工作原理",
+        "meta": {
+          "title": "连接 AI 智能体（MCP）",
+          "description": "通过 MCP 将 Claude、ChatGPT、Cursor 及其他智能体客户端连接到您的账户，支持 OAuth 或 API 密钥。"
+        }
+      },
+      "Search": {
+        "placeholder": "搜索文档...",
+        "searching": "正在搜索文档...",
+        "minChars": "请至少输入 {count} 个字符再进行搜索。",
+        "noResults": "未找到匹配的文档。"
+      },
+      "MarkdownButton": {
+        "copyMarkdown": "复制 Markdown",
+        "moreOptions": "更多选项",
+        "openAsMarkdown": "以 Markdown 打开",
+        "llmsTxt": "llms.txt",
+        "download": "下载"
+      },
+      "Page": {
+        "docs": "文档",
+        "sectionFallbackDescription": "浏览本节中的页面。",
+        "section": "章节",
+        "noChildPages": "本节暂无公开的子页面。",
+        "groupListName": "{group} 文档",
+        "onThisPage": "本页内容"
+      }
+    },
+    "Landing": {
+      "Cta": {
+        "titleLine1": "一条命令克隆。",
+        "titleLine2": "上线由你掌控。",
+        "description": "免费开源。无许可费用，无署名要求。Fork 它，改名，变成你自己的产品。",
+        "copy": "复制",
+        "copyAriaLabel": "复制克隆命令",
+        "starOnGithub": "在 GitHub 上点星",
+        "exploreDemo": "查看演示"
+      },
+      "DeployTerminal": {
+        "windowTitle": "~/your-saas — 部署"
+      }
+    },
+    "Validation": {
+      "required": "此字段为必填项",
+      "invalidString": "请输入文本",
+      "invalidNumber": "请输入数字",
+      "invalidBoolean": "请选择一个选项",
+      "invalidDate": "请输入有效的日期",
+      "invalidEmail": "请输入有效的邮箱地址",
+      "invalidUrl": "请输入有效的 URL",
+      "invalidIconKey": "请选择有效的图标",
+      "invalidObject": "请提供有效的值",
+      "minLength": "长度至少为 {min} 个字符",
+      "maxLength": "长度不能超过 {max} 个字符",
+      "passwordMinLength": "密码长度至少为 {min} 个字符",
+      "passwordMaxLength": "密码长度不能超过 {max} 个字符",
+      "passwordsDoNotMatch": "两次输入的密码不一致",
+      "emailRequired": "邮箱为必填项",
+      "emailMaxLength": "邮箱长度不能超过 {max} 个字符",
+      "nameRequired": "姓名为必填项",
+      "nameMaxLength": "姓名长度不能超过 {max} 个字符",
+      "teamNameRequired": "团队名称为必填项",
+      "teamNameMaxLength": "团队名称长度不能超过 {max} 个字符",
+      "descriptionMaxLength": "描述长度不能超过 {max} 个字符",
+      "urlMaxLength": "URL 长度不能超过 {max} 个字符",
+      "titleRequired": "标题为必填项",
+      "slugRequired": "Slug 为必填项",
+      "sessionIdRequired": "会话 ID 为必填项",
+      "teamIdRequired": "团队 ID 为必填项",
+      "userIdRequired": "用户 ID 为必填项",
+      "roleRequired": "角色为必填项",
+      "invitationTokenRequired": "邀请令牌为必填项",
+      "invitationIdRequired": "邀请为必填项",
+      "verificationTokenRequired": "验证令牌为必填项",
+      "authorizationCodeRequired": "授权码为必填项",
+      "stateParameterRequired": "State 参数为必填项",
+      "invalidPage": "页码无效",
+      "invalidLimit": "每页数量无效",
+      "limitMaxValue": "每页数量不能大于 {max}",
+      "packageRequired": "套餐为必填项",
+      "paymentIntentRequired": "支付意图为必填项",
+      "invalidRegistrationResponse": "注册响应无效",
+      "invalidAuthenticationResponse": "认证响应无效",
+      "scheduledStatusRequiresFutureDate": "当 publishedAt 设置为未来日期时，状态必须为 scheduled",
+      "scheduledRequiresFuturePublishDate": "定时发布的条目需要设置未来的发布日期",
+      "apiKeyNameRequired": "API 密钥名称为必填项",
+      "apiKeyNameMaxLength": "API 密钥名称长度不能超过 {max} 个字符",
+      "apiKeyScopesRequired": "请至少选择一个范围",
+      "apiKeyInvalidScope": "未知范围",
+      "apiKeyInvalidExpiry": "请选择有效的有效期",
+      "apiKeyExpiryMaxDays": "有效期不能超过 {max} 天",
+      "apiKeyIdRequired": "API 密钥为必填项",
+      "invalidEmailPattern": "请输入邮箱地址、*@example.com 或 *@*.example.com"
+    },
+    "Sidebar": {
+      "toggle": "切换侧边栏",
+      "groups": {
+        "platform": "平台",
+        "projects": "项目"
+      },
+      "nav": {
+        "dashboard": "控制台",
+        "teams": "团队",
+        "billing": "账单",
+        "settings": "设置",
+        "profile": "个人资料",
+        "security": "安全",
+        "sessions": "会话",
+        "apiMcp": "API 与 MCP",
+        "changePassword": "更改密码",
+        "adminPanel": "管理面板",
+        "designEngineering": "设计与工程",
+        "salesMarketing": "销售与营销",
+        "travel": "差旅"
+      },
+      "projects": {
+        "more": "更多",
+        "view": "查看项目",
+        "share": "分享项目",
+        "delete": "删除项目"
+      },
+      "user": {
+        "account": "账户",
+        "billing": "账单",
+        "notifications": "通知",
+        "changeTheme": "更改主题",
+        "changeLanguage": "更改语言",
+        "logOut": "登出"
+      }
+    },
+    "Dashboard": {
+      "Home": {
+        "breadcrumb": "控制台",
+        "example": "示例"
+      },
+      "layout": {
+        "header": "控制台"
+      },
+      "Teams": {
+        "metaTitle": "我的团队",
+        "metaDescription": "管理你的团队与协作",
+        "breadcrumb": "团队",
+        "title": "我的团队",
+        "subtitle": "管理你的团队与协作",
+        "createTeam": "创建团队",
+        "emptyTitle": "你还没有任何团队",
+        "emptyDescription": "团队让你可以与他人协作完成项目并共享资源。",
+        "createFirstTeam": "创建你的第一个团队",
+        "yourRole": "你的角色：",
+        "noDescription": "未提供描述",
+        "createNewTeam": "创建新团队",
+        "createMetaTitle": "创建团队",
+        "createMetaDescription": "为你的组织创建一个新团队",
+        "createPageSubtitle": "创建团队，与他人协作完成项目并共享资源。",
+        "teamNotFound": "未找到团队",
+        "teamMetaTitle": "{name} - 控制台",
+        "teamMetaDescription": "{name} 的团队控制台",
+        "accessDenied": "无访问权限",
+        "accessDeniedDescription": "你没有权限访问团队“{name}”。请联系团队所有者申请访问权限。",
+        "returnToTeams": "返回团队",
+        "inviteMembers": "邀请成员",
+        "seatLimitReached": "该团队已达到套餐的 {seats} 席位上限。请升级套餐以添加更多成员。",
+        "yourRoleLabel": "你的角色",
+        "memberRole": "成员",
+        "created": "创建时间",
+        "teamMembers": "团队成员",
+        "apiKeysTitle": "团队 API 密钥",
+        "columnMember": "成员",
+        "columnEmail": "邮箱",
+        "columnRole": "角色",
+        "columnJoined": "加入时间",
+        "columnInvited": "邀请时间",
+        "columnExpires": "过期时间",
+        "columnStatus": "状态",
+        "columnAction": "操作",
+        "noMembersFound": "未找到成员",
+        "notJoined": "尚未加入",
+        "statusActive": "活跃",
+        "statusInactive": "非活跃",
+        "statusPending": "待处理",
+        "ownerCannotBeRemoved": "团队所有者无法被移除",
+        "fetchInvitationsError": "获取待处理邀请失败",
+        "joinedTeamSuccess": "你已成功加入该团队",
+        "acceptInvitationError": "接受邀请失败",
+        "pendingInvitationsTitle": "待处理的团队邀请",
+        "pendingInvitationsDescription": "你已被邀请加入以下团队",
+        "invitedBy": "{name} 邀请",
+        "accepting": "接受中...",
+        "accept": "接受",
+        "formNameLabel": "团队名称",
+        "formNamePlaceholder": "输入团队名称",
+        "formNameDescription": "团队的唯一名称",
+        "formDescriptionLabel": "描述",
+        "formDescriptionPlaceholder": "输入团队的简要描述",
+        "formDescriptionHelp": "可选填写团队的用途说明",
+        "toastCreating": "正在创建团队...",
+        "toastCreateSuccess": "团队创建成功",
+        "toastCreateError": "创建团队失败",
+        "inviteModalTitle": "邀请团队成员",
+        "inviteEmailLabel": "邮箱地址",
+        "inviteEmailPlaceholder": "colleague@example.com",
+        "sendInvitation": "发送邀请",
+        "toastSendingInvite": "正在发送邀请...",
+        "toastInviteSuccess": "邀请发送成功",
+        "toastInviteError": "邀请用户失败",
+        "removeMemberTitle": "移除团队成员",
+        "removeMemberDescription": "确定要将 {name} 从该团队中移除吗？此操作无法撤销。",
+        "removeMember": "移除成员",
+        "removing": "移除中...",
+        "cannotRemoveMember": "无法移除成员",
+        "cannotRemoveTooltip": "你无法移除该成员",
+        "toastRemoveSuccess": "团队成员移除成功",
+        "toastRemoveError": "移除团队成员失败",
+        "revokeInvitationTitle": "撤销邀请",
+        "revokeInvitationDescription": "确定要撤销 {email} 的邀请吗？邀请链接将立即失效。",
+        "revokeInvitationFor": "撤销 {email} 的邀请",
+        "revokeInvitation": "撤销邀请",
+        "revokingInvitation": "撤销中...",
+        "toastRevokeInvitationSuccess": "邀请撤销成功",
+        "toastRevokeInvitationError": "撤销邀请失败",
+        "switcherNoTeam": "无团队",
+        "switcherTeamsLabel": "团队",
+        "switcherNoTeams": "暂无可用团队",
+        "switcherAddTeam": "添加团队",
+        "toastUpdateSelectedTeamError": "更新所选团队失败",
+        "errorCreateLimit": "你已达到可创建团队的上限（{max} 个）。",
+        "errorSlugGeneration": "无法为该团队生成唯一的 slug",
+        "errorCouldNotCreate": "无法创建团队",
+        "errorGetTeams": "获取用户团队失败",
+        "errorInvalidRole": "无效的团队角色",
+        "errorOwnerViaInvite": "不能通过邀请指定团队所有者",
+        "errorRoleNotFound": "未找到团队角色",
+        "errorNoPermissionAssignRole": "你没有权限分配该角色",
+        "errorTeamPermissionRequired": "你在该团队中不具备所需的权限",
+        "errorCannotAssignPermissions": "你不能授予包含你自身不具备的权限的角色",
+        "errorMembershipNotFound": "未找到团队成员关系",
+        "errorCannotRemoveOwner": "无法移除团队所有者",
+        "errorTeamNotFound": "未找到团队",
+        "errorAlreadyMember": "该用户已是团队成员",
+        "errorUserJoinLimit": "该用户已达到可加入团队的上限（{max} 个）。",
+        "errorCouldNotCreateInvitation": "无法创建邀请",
+        "errorInvitationNotFound": "未找到邀请",
+        "errorOwnerRequiredToRevokeInvitation": "只有团队所有者才能撤销邀请",
+        "errorInvitationExpired": "邀请已过期",
+        "errorInvitationAlreadyAccepted": "邀请已被接受",
+        "errorInvitationWrongEmail": "此邀请对应的是其他邮箱地址",
+        "errorNoAccountEmail": "你的账户需要经过验证的邮箱地址才能接受邀请",
+        "errorAlreadyOnTeam": "你已经是该团队的成员",
+        "errorJoinLimit": "你已达到可加入团队的上限（{max} 个）。",
+        "errorMustBeLoggedIn": "你必须登录后才能更新所选团队",
+        "errorTeamNotFoundOrNotMember": "未找到团队，或者你不是该团队成员",
+        "errorUpdateSelectedTeam": "更新所选团队失败",
+        "errorGetPendingInvitations": "获取待处理的团队邀请失败",
+        "errorAcceptInvitation": "接受邀请失败",
+        "teamFallbackName": "团队",
+        "teamOwnerFallback": "团队所有者",
+        "roleOwner": "所有者",
+        "roleMember": "成员",
+        "roleGuest": "访客",
+        "roleCustom": "自定义角色",
+        "renameTeam": "重命名团队",
+        "renameModalTitle": "重命名团队",
+        "renameModalUrlNote": "团队的网址保持不变。",
+        "renameNameLabel": "团队名称",
+        "toastRenaming": "正在重命名团队...",
+        "toastRenameSuccess": "团队重命名成功",
+        "toastRenameError": "重命名团队失败",
+        "errorInvitationEmailNotAllowed": "该邮箱地址无法用于注册。"
+      },
+      "Billing": {
+        "breadcrumbDashboard": "控制台",
+        "breadcrumbBilling": "账单",
+        "title": "账单",
+        "subtitle": "管理团队的订阅与套餐。",
+        "currentPlanTitle": "当前套餐",
+        "planLabel": "套餐",
+        "statusLabel": "状态",
+        "renewsOn": "{date} 续订",
+        "endsOn": "访问将于 {date} 结束",
+        "trialEndsOn": "免费试用将于 {date} 结束",
+        "statusActive": "生效中",
+        "statusTrialing": "试用中",
+        "statusPastDue": "已逾期",
+        "statusCanceled": "已取消",
+        "statusIncomplete": "未完成",
+        "statusUnpaid": "未支付",
+        "statusPaused": "已暂停",
+        "statusUnknown": "未知",
+        "cancelScheduled": "你的订阅将在当前账单周期结束时结束。",
+        "plansTitle": "套餐",
+        "plansSubtitle": "选择适合你团队的套餐。",
+        "seatsFeature": "{seats, plural, one {# 个席位} other {# 个席位}}",
+        "projectsFeature": "{projects, plural, one {# 个项目} other {# 个项目}}",
+        "planContent": {
+          "free": {
+            "description": "适合尝鲜的基础功能",
+            "features": [
+              "社区支持",
+              "核心控制台功能"
+            ]
+          },
+          "pro": {
+            "description": "适合需要更多功能的成长型团队",
+            "features": [
+              "优先邮箱支持",
+              "高级数据分析",
+              "自定义域名"
+            ]
+          },
+          "enterprise": {
+            "description": "适合大规模运营的组织",
+            "features": [
+              "专属支持",
+              "SSO 与可审计访问",
+              "自定义集成"
+            ]
+          }
+        },
+        "perMonth": "/月",
+        "perYear": "/年",
+        "billingIntervalMonthly": "按月",
+        "billingIntervalYearly": "按年",
+        "yearlySaveBadge": "节省 {percent}%",
+        "yearlyEquivalentNote": "{price}/月，按年计费",
+        "switchToYearly": "切换为按年计费",
+        "switchToMonthly": "切换为按月计费",
+        "billedYearly": "按年计费",
+        "billedMonthly": "按月计费",
+        "freePrice": "免费",
+        "currentPlanBadge": "当前套餐",
+        "trialBadge": "{days} 天免费试用",
+        "subscribe": "订阅",
+        "startFreeTrial": "开始 {days} 天免费试用",
+        "changeToPlan": "切换到 {plan}",
+        "cancelSubscription": "取消订阅",
+        "resumeSubscription": "恢复订阅",
+        "readOnlyNotice": "只有团队管理员才能管理账单。",
+        "billingDisabledNotice": "此部署未配置账单功能。",
+        "paymentDialogTitle": "订阅 {plan}",
+        "securePaymentInfo": "你的支付安全且经过加密。我们使用值得信赖的全球支付服务商 Stripe 处理你的付款。",
+        "paymentDetailsInfo": "为保障安全，你的支付信息由 Stripe 直接处理，绝不会经过我们的服务器。",
+        "processing": "处理中...",
+        "payNow": "立即支付",
+        "startTrialAction": "开始免费试用",
+        "trialPaymentNote": "今天不会产生扣费——你的卡仅用于验证。验证通过后即开始 {days} 天免费试用，首次扣款将在试用结束时进行。在此之前可随时取消。",
+        "paymentFailed": "支付失败",
+        "activating": "正在激活你的订阅…",
+        "subscriptionActive": "你的订阅已生效。",
+        "completePaymentTitle": "完成你的支付",
+        "completePaymentDescription": "你的上一笔支付需要确认，订阅才能保持生效。",
+        "completePayment": "完成支付",
+        "confirmCancelTitle": "确定取消订阅？",
+        "confirmCancelDescription": "在当前账单周期结束前，你的团队仍可继续使用，之后将恢复为 Free 套餐。",
+        "confirmCancelAction": "确定取消",
+        "errorStartCheckout": "发起结账失败",
+        "errorTrialUnavailable": "该团队无法使用免费试用。",
+        "errorTrialPaymentMethodUnsupported": "此套餐不支持该支付方式。请选择其他支付方式。",
+        "trialSetupPending": "你的银行仍在验证你的支付方式。请稍后刷新此页面，以完成免费试用的开通。",
+        "errorPaymentProvider": "支付服务商出现异常，请稍后再试。",
+        "errorNoClientSecret": "无法开始订阅，请重试。",
+        "errorPlanChangeRequiresPaidAccess": "更换套餐前，请先完成待处理的支付。",
+        "manageBilling": "管理账单",
+        "manageBillingDescription": "在 Stripe 客户门户中更新支付方式、查看发票并编辑账单信息。",
+        "errorBillingPortal": "无法打开账单门户，请重试。",
+        "addonsTitle": "附加组件",
+        "addonsSubtitle": "用可选扩展增强你的套餐。",
+        "addonsRequirePaidPlan": "附加组件需要有效的付费订阅。",
+        "addonContent": {
+          "extra-seats": {
+            "description": "为团队添加超出套餐内含上限的额外席位。"
+          }
+        },
+        "addonEach": "每个",
+        "addonActiveBadge": "{quantity} 个生效中",
+        "addonSeatsGrant": "{seats, plural, one {+# 个席位} other {+# 个席位}}",
+        "addonProjectsGrant": "{projects, plural, one {+# 个项目} other {+# 个项目}}",
+        "addonDecrease": "减少数量",
+        "addonIncrease": "增加数量",
+        "addonAdd": "添加到订阅",
+        "addonUpdate": "更新数量",
+        "addonRemove": "从订阅中移除",
+        "addonUpdated": "附加组件已更新。",
+        "errorAddonUnavailable": "该附加组件不可用。",
+        "errorAddonMaxQuantity": "该附加组件最多可持有 {max} 个。"
+      }
+    },
+    "Settings": {
+      "Nav": {
+        "settings": "设置",
+        "overview": "概览",
+        "profile": "个人资料",
+        "security": "安全",
+        "sessions": "会话",
+        "apiMcp": "API & MCP",
+        "changePassword": "修改密码",
+        "toastSigningOut": "正在登出...",
+        "toastSignOutError": "登出失败"
+      },
+      "Profile": {
+        "cardTitle": "个人资料设置",
+        "cardDescription": "更新你的个人信息与联系方式。",
+        "firstNameLabel": "名字",
+        "lastNameLabel": "姓氏",
+        "emailLabel": "邮箱",
+        "emailDescription": "这是你用于登录的邮箱。",
+        "saveButton": "保存更改",
+        "toastUpdating": "正在更新个人资料...",
+        "toastUpdateSuccess": "个人资料更新成功",
+        "toastUpdateError": "更新个人资料失败",
+        "errorUpdateFailed": "更新个人资料失败"
+      },
+      "Language": {
+        "cardTitle": "语言",
+        "cardDescription": "选择控制台和账户页面使用的语言。"
+      },
+      "Device": {
+        "deviceDescription": "{browserName} {browserVersion}，运行于 {deviceVendor} {deviceModel} {deviceType}（{osName} {osVersion}）",
+        "unknownBrowser": "未知浏览器",
+        "unknownVersion": "未知版本",
+        "unknownDevice": "未知设备",
+        "unknownModel": "未知型号",
+        "unknownType": "未知类型",
+        "unknownOs": "未知操作系统"
+      },
+      "Security": {
+        "passkeysHeading": "通行密钥",
+        "passkeysSubheading": "管理你的通行密钥，实现无密码身份验证。",
+        "registerButton": "注册通行密钥",
+        "registering": "注册中...",
+        "unknownAuthenticator": "未知身份验证器应用",
+        "currentPasskeyBadge": "当前通行密钥",
+        "deletePasskey": "删除通行密钥",
+        "deletingPasskey": "删除中…",
+        "deletePasskeyConfirmTitle": "确定删除通行密钥？",
+        "deletePasskeyConfirmDescription": "此操作将从你的账户中移除该通行密钥，且无法撤销。",
+        "emptyState": "尚未找到通行密钥。添加通行密钥即可启用无密码身份验证。",
+        "toastRegisterSuccess": "通行密钥注册成功",
+        "toastRegisterError": "注册通行密钥失败",
+        "toastOptionsError": "获取注册选项失败",
+        "toastDeleteSuccess": "通行密钥已删除",
+        "toastDeleteError": "删除通行密钥失败",
+        "errorRegisterOwnAccount": "只能为自己的账户注册通行密钥",
+        "errorPasskeyLimit": "你已达到通行密钥数量上限（{limit} 个）",
+        "errorInvalidRegistrationSession": "无效的注册会话",
+        "errorRegisterFailed": "注册通行密钥失败",
+        "errorDeleteCurrentPasskey": "无法删除当前使用的通行密钥",
+        "errorPasskeyNotFound": "未找到通行密钥",
+        "errorDeleteLastPasskey": "未设置密码时，无法删除最后一个通行密钥",
+        "errorInvalidAuthSession": "无效的身份验证会话",
+        "errorAuthFailed": "通行密钥身份验证失败"
+      },
+      "Sessions": {
+        "metaTitle": "会话",
+        "metaDescription": "管理你的活跃会话",
+        "unknownLocation": "未知位置",
+        "currentSessionBadge": "当前会话",
+        "authenticatedWith": "通过 {method} 身份验证",
+        "authMethodPassword": "密码",
+        "authMethodPasskey": "通行密钥",
+        "authMethodGoogleOauth": "Google",
+        "deleteSession": "删除会话",
+        "deletingSession": "删除中…",
+        "deleteSessionConfirmTitle": "确定删除会话？",
+        "deleteSessionConfirmDescription": "此操作将登出该设备，且无法撤销。",
+        "toastDeleteSuccess": "会话已删除",
+        "toastDeleteError": "删除会话失败",
+        "errorUnauthorized": "未授权"
+      },
+      "ApiMcp": {
+        "metaTitle": "API & MCP",
+        "metaDescription": "连接 AI 智能体、管理 API 密钥，并撤销可访问你账户的应用"
+      },
+      "ApiKeys": {
+        "title": "API 密钥",
+        "description": "密钥可让应用、脚本和 AI 智能体代表你执行操作，且仅限于你授予的范围。它们可以调用的所有端点，请参阅<link>API 参考</link>。",
+        "teamDescription": "密钥可让应用、脚本和 AI 智能体在此团队中代表你执行操作，且仅限于你授予的范围。团队密钥只能用于该团队，不能用于你的账户或其他团队。它们可以调用的所有端点，请参阅<link>API 参考</link>。",
+        "createButton": "创建密钥",
+        "createDialogTitle": "创建 API 密钥",
+        "createDialogDescription": "密钥内容只在创建后立即显示一次。",
+        "nameLabel": "名称",
+        "namePlaceholder": "例如：部署脚本",
+        "scopesLabel": "范围",
+        "scopesSelectedCount": "已选择 {selected}/{total}",
+        "selectAllScopes": "全选",
+        "clearAllScopes": "清除全部",
+        "expiryLabel": "过期时间",
+        "expiryNever": "永不过期",
+        "expiryDays": "{days} 天后",
+        "secretTitle": "复制你的 API 密钥",
+        "secretDescription": "这是唯一一次显示密钥内容，请妥善保存。",
+        "copySecret": "复制密钥",
+        "secretDone": "完成",
+        "emptyTitle": "还没有 API 密钥",
+        "emptyDescription": "创建密钥以连接应用、脚本或 AI 智能体。",
+        "createdLabel": "创建于 {date}",
+        "lastUsedLabel": "上次使用于 {date}",
+        "lastUsedNever": "从未使用",
+        "expiresLabel": "过期于 {date}",
+        "expiresNever": "无过期时间",
+        "editScopes": "编辑范围",
+        "editScopesDialogTitle": "编辑此密钥的范围",
+        "editScopesDialogDescription": "密钥内容和名称保持不变。你保留勾选的范围将替换现有范围，更改立即生效。",
+        "saveScopes": "保存范围",
+        "savingScopes": "保存中…",
+        "revoke": "撤销",
+        "revoking": "撤销中…",
+        "revokeConfirmTitle": "确定撤销此密钥？",
+        "revokeConfirmDescription": "所有使用该密钥的地方都将停止工作。此操作无法撤销。",
+        "revocationDelayNote": "已撤销的密钥在缓存副本过期前仍可能有效，最长可达 {minutes} 分钟。",
+        "toastCreateSuccess": "API 密钥已创建",
+        "toastCreateError": "创建 API 密钥失败",
+        "toastRevokeSuccess": "API 密钥已撤销",
+        "toastRevokeError": "撤销 API 密钥失败",
+        "toastUpdateScopesSuccess": "API 密钥范围已更新",
+        "toastUpdateScopesError": "更新 API 密钥范围失败",
+        "errorScopesRequired": "请至少选择一个范围",
+        "errorInvalidScope": "未知范围",
+        "errorUserLimitReached": "你最多可拥有 {max} 个有效的 API 密钥",
+        "errorTeamLimitReached": "该团队最多可拥有 {max} 个有效的 API 密钥",
+        "errorKeyNotFound": "未找到 API 密钥",
+        "errorKeyNotEditable": "此密钥的范围需在其创建处管理，无法在此修改。",
+        "errorTeamKeyOtherTeam": "此密钥只能用于其创建时所属的团队。",
+        "errorTeamKeyAccountOnly": "此密钥只能用于其所属团队，不能用于账户级设置。",
+        "errorTeamKeyAccountScope": "团队密钥不能持有账户级范围：{scopes}"
+      },
+      "ConnectedApps": {
+        "title": "已连接的应用",
+        "description": "你已授权访问你账户的应用、AI 智能体和 MCP 客户端。",
+        "emptyTitle": "没有已连接的应用",
+        "emptyDescription": "当你批准应用或连接 AI 智能体后，它会显示在这里。",
+        "unknownApp": "未知应用",
+        "verifiedBadge": "已验证",
+        "unverifiedBadge": "未验证",
+        "grantedLabel": "连接于 {date}",
+        "revoke": "撤销访问权限",
+        "revoking": "撤销中…",
+        "revokeConfirmTitle": "确定撤销此应用的访问权限？",
+        "revokeConfirmDescription": "该应用将立即失去访问权限，并且需要重新请求你的批准。",
+        "toastRevokeSuccess": "访问权限已撤销",
+        "toastRevokeError": "撤销访问权限失败"
+      }
+    },
+    "Errors": {
+      "unexpected": "发生了意外错误",
+      "notAuthenticated": "未登录",
+      "notAuthorized": "无权限",
+      "requiresBrowserSession": "此操作仅在浏览器中登录应用后可用",
+      "emailVerificationRequired": "请先验证你的邮箱",
+      "userNotFound": "未找到用户",
+      "invalidInput": "输入无效",
+      "rateLimitExceeded": "请求频率超限。请在 {minutes, plural, =1 {1 分钟} other {# 分钟}}后重试。",
+      "pageErrorTitle": "此部分无法加载",
+      "retry": "重试",
+      "retrying": "正在重试…"
+    },
+    "Pagination": {
+      "navAria": "分页",
+      "previous": "上一页",
+      "next": "下一页",
+      "previousAria": "转到上一页",
+      "nextAria": "转到下一页",
+      "morePages": "更多页面"
+    },
+    "ThemeSwitch": {
+      "toggle": "切换主题",
+      "system": "跟随系统",
+      "light": "浅色",
+      "dark": "深色"
+    },
+    "AskiChatBanner": {
+      "builtBy": "由",
+      "brand": "Aski.Chat",
+      "description": "AI 客服智能体：回答访客问题、捕获潜在客户，并从每段对话中挖掘客户洞察。",
+      "cta": "从 Aski.Chat 开始"
+    },
+    "GithubStars": {
+      "starTheRepo": "为仓库加星",
+      "stars": "个星标",
+      "github": "GitHub",
+      "starAria": "在 GitHub 上为仓库加星",
+      "starAriaWithCount": "在 GitHub 上为仓库加星 — {count} 个星标"
+    },
+    "OAuth": {
+      "metaTitle": "授权应用",
+      "metaDescription": "查看并批准应用请求的访问权限",
+      "title": "{app} 想要访问你的账户",
+      "unknownApp": "某个应用",
+      "verifiedBadge": "已验证应用",
+      "unverifiedBadge": "未验证应用",
+      "signedInAs": "当前登录身份为 {email}。",
+      "switchAccount": "切换账户",
+      "unverifiedWarningTitle": "{app} 尚未通过验证",
+      "unverifiedWarningBody": "任何人都可以使用该名称注册应用，而这个应用请求修改你的数据，而不仅仅是读取。只有当你本人发起此操作并且信任该应用时，才请继续。",
+      "permissionsTitle": "它将能够：",
+      "permissionCount": "{granted} / {requested}",
+      "readGroup": "读取权限",
+      "writeGroup": "写入权限",
+      "noScopes": "未请求任何权限。",
+      "clampedScopes": "这些请求的权限不适用于未验证的应用，不会被授予：{scopes}",
+      "clientIdHostLabel": "Client ID 主机名",
+      "clientIdLabel": "客户端 ID",
+      "redirectHostLabel": "重定向 URI 主机名",
+      "localRedirectWarning": "本地重定向：该应用会在此设备上接收授权码。只有当你信任打开此页面的应用时，才请继续。",
+      "grantCapWarning": "{count, plural, one {你已达到已连接应用的数量上限。批准后将断开 {apps}（即你最早连接的应用）。} other {你已达到已连接应用的数量上限。批准后将断开 {apps}（即你最早连接的应用）。}}",
+      "approve": "批准",
+      "deny": "拒绝",
+      "toastDecisionError": "无法完成授权",
+      "errorMissingRedirect": "该应用未提供重定向地址，因此无法完成请求",
+      "invalidRequestTitle": "此授权请求无效",
+      "invalidRequestDescription": "该应用发送了未知的客户端或未注册的重定向地址。请返回该应用并重新开始。",
+      "adminVerifyTitle": "{app} 正在请求管理员访问权限",
+      "adminVerifyBody": "这些权限会覆盖此部署上的每个账户，因此只会授予经人担保的应用。验证会将 {app} 标记为对这里的所有人（而不仅是你）已验证。",
+      "adminVerifyButton": "验证此应用并允许管理员访问",
+      "adminVerifyToastSuccess": "应用已验证。以下管理员权限现在可以授予了。",
+      "adminVerifyToastError": "无法验证此应用",
+      "adminHintTitle": "此应用曾请求管理员访问权限",
+      "adminHintUnknownClient": "此部署无法识别该客户端，因此在考虑任何权限之前请求已被拒绝。由 URL 标识的代理客户端只有在此服务器能够获取其元数据文档后才会被识别，而在阻止该请求的主机上这会失败。",
+      "adminHintVerifyNext": "管理员权限还要求应用已通过验证。客户端注册后，请在同意屏幕或 <code>{path}</code> 处验证它，然后重新开始连接。"
+    },
+    "Mcp": {
+      "title": "连接 AI 代理",
+      "description": "此账户可通过 Model Context Protocol 访问，因此代理可以调用与你相同的操作——仅限于你授予它的范围。",
+      "docsCrossLink": "第一次接触？阅读<link>连接 AI 代理指南</link>。",
+      "endpointLabel": "MCP 端点",
+      "endpointHint": "Streamable HTTP。大多数客户端只需要此 URL。",
+      "oauthTab": "登录（OAuth）",
+      "apiKeyTab": "API 密钥",
+      "oauthHint": "客户端会打开一个浏览器窗口，你只需批准一次所请求的范围。无需复制任何内容，之后可以在“设置 → API & MCP”下的已连接应用列表中撤销。",
+      "apiKeyHint": "客户端将密钥作为 Bearer 令牌发送。最适合命令行和脚本客户端。",
+      "placeholderNote": "将 {placeholder} 替换为上面创建的密钥。",
+      "freshKeyNote": "这些代码片段已包含你的新密钥。它们仅在此对话框打开时显示。",
+      "copySnippet": "复制",
+      "clientDocs": "客户端文档",
+      "pasteUrl": "将此 URL 粘贴到客户端的连接器设置中。",
+      "runCommand": "运行此命令。",
+      "addToFile": "将此添加到 <code>{file}</code>。"
+    },
+    "RestApi": {
+      "title": "调用 REST API",
+      "description": "该密钥也可作为 HTTP API 的 Bearer 令牌。代理可以调用的每个操作都是一个普通的 REST 端点，受相同范围限制。",
+      "baseUrlLabel": "API 基础 URL",
+      "snippetHint": "试一试。此请求返回该密钥所属的账户，且已包含你的新密钥。",
+      "placeholderNote": "将 {placeholder} 替换为上面创建的密钥。",
+      "copySnippet": "复制",
+      "referenceLink": "浏览 API 参考",
+      "specLink": "OpenAPI 文档"
+    },
+    "Admin": {
+      "OAuthApps": {
+        "metaTitle": "OAuth 应用 | 管理员",
+        "breadcrumbAdmin": "管理员",
+        "breadcrumbOAuthApps": "OAuth 应用",
+        "metaDescription": "查看、验证和删除已注册的 OAuth 客户端",
+        "title": "OAuth 应用",
+        "description": "逐一审查每个 Client ID；名称或重定向匹配的应用永远不会被自动合并或自动信任。元数据文档身份和运营方签发的身份更适合稳定的集成。已验证的动态注册在保持批准状态期间会自动续期。",
+        "columnName": "名称",
+        "columnClientId": "客户端 ID",
+        "columnSource": "来源",
+        "columnVerified": "状态",
+        "columnCreated": "创建时间",
+        "columnLastRenewed": "上次续期",
+        "sourceCimd": "元数据文档（首选）",
+        "sourceDcr": "动态注册（后备）",
+        "sourcePortal": "运营方签发（首选）",
+        "sourceUnknown": "旧版 / 未知",
+        "verified": "已验证",
+        "unverified": "未验证",
+        "unnamed": "未命名应用",
+        "never": "从未",
+        "notApplicable": "不适用",
+        "actions": "操作",
+        "openMenu": "打开菜单",
+        "copyClientId": "复制客户端 ID",
+        "verifyAction": "标记为已验证",
+        "unverifyAction": "移除验证",
+        "deleteAction": "删除应用并撤销授予",
+        "loading": "加载中...",
+        "loadError": "加载 OAuth 应用失败",
+        "empty": "未找到 OAuth 应用",
+        "itemSingular": "个应用",
+        "itemPlural": "个应用",
+        "toastVerifySuccess": "验证状态已更新",
+        "toastVerifyError": "更新验证状态失败",
+        "toastDeleteSuccess": "应用已删除，授予已撤销",
+        "toastDeleteError": "删除应用失败"
+      },
+      "UserDetail": {
+        "columnAction": "操作",
+        "revoke": "撤销",
+        "revoking": "撤销中...",
+        "connectedAppsTitle": "已连接应用（{count}）",
+        "connectedAppsDescription": "该用户已批准的 OAuth 授予。撤销其中一个会删除该授予及其签发的所有令牌。",
+        "connectedAppsEmpty": "该用户尚未连接任何应用",
+        "unknownApp": "未知应用",
+        "unknownDate": "未知",
+        "verified": "已验证",
+        "unverified": "未验证",
+        "revokeAppTitle": "撤销应用访问权限",
+        "revokeAppDescription": "{name} 将立即失去对此账户的访问权限。该用户必须重新批准才能重新连接。",
+        "toastRevokeAppSuccess": "应用访问权限已撤销",
+        "toastRevokeAppError": "撤销应用访问权限失败",
+        "apiKeysTitle": "API 密钥（{count}）",
+        "apiKeysDescription": "该用户拥有的有效密钥，包括个人密钥和团队范围密钥。密钥被撤销后，会在 {minutes} 分钟内在所有地方失效。",
+        "apiKeysEmpty": "该用户没有有效的 API 密钥",
+        "columnTeam": "团队",
+        "personalKey": "个人",
+        "toastRevokeKeySuccess": "API 密钥已撤销",
+        "toastRevokeKeyError": "撤销 API 密钥失败",
+        "teamsTitle": "团队（{count}）",
+        "teamsDescription": "该用户所属的每个团队。移除成员资格会撤销其对相应团队的访问权限。",
+        "teamsEmpty": "该用户不属于任何团队",
+        "columnRole": "角色",
+        "columnJoined": "加入时间",
+        "columnStatus": "状态",
+        "notJoined": "未加入",
+        "statusActive": "活跃",
+        "statusInactive": "非活跃",
+        "removeFromTeam": "移除",
+        "removing": "移除中...",
+        "removeFromTeamTitle": "从团队中移除",
+        "removeFromTeamDescription": "该用户将立即失去对 {team} 的访问权限。必须再次邀请才能重新加入。",
+        "toastRemoveTeamSuccess": "用户已从团队中移除",
+        "toastRemoveTeamError": "从团队中移除用户失败"
+      }
+    },
+    "Blog": {
+      "PostNotFound": {
+        "title": "博客文章未找到",
+        "description": "你要查找的博客文章不存在或已被移除。",
+        "backToBlog": "返回博客"
+      }
+    }
+  },
+  "Landing": {
+    "meta": {
+      "title": "SaaS Template",
+      "description": "一款基于 Next.js 16 与 Cloudflare Workers 构建的现代化 SaaS 模板，为可扩展性与性能而生。"
+    },
+    "Hero": {
+      "titleLine1": "让你的 SaaS",
+      "titleLine2": "直达",
+      "titleEdge": "边缘",
+      "description": "一套完整、可用于生产环境的 SaaS 应用起点，专为在 Cloudflare Workers 上构建 SaaS 而生。认证、数据库、账单、邮箱与管理工具均已就绪——克隆仓库，几分钟内即可全球部署。",
+      "starOnGithub": "在 GitHub 上点个 Star",
+      "tryLiveDemo": "体验在线演示"
+    },
+    "Stack": {
+      "heading": "// 整套技术栈，已装配完毕",
+      "cloudflarePlatform": "Cloudflare 平台",
+      "appFramework": "应用框架"
+    },
+    "Features": {
+      "eyebrow": "// 开箱即含",
+      "heading": "告别样板代码，直接构建产品。",
+      "description": "SaaS 中所有无差异的部分都已备好并通过测试。打开仓库，开始编写只有你的产品才需要的代码。",
+      "auth": {
+        "name": "认证，一步到位",
+        "description": "基于 Lucia Auth 的邮箱密码登录、注册、密码重置与会话管理——另支持 Passkey 与 Google OAuth。"
+      },
+      "data": {
+        "name": "数据库与邮箱",
+        "description": "基于 Cloudflare D1 的 Drizzle ORM、由 KV 支撑的会话，以及直接从 Worker 发送的事务性邮件。"
+      },
+      "edge": {
+        "name": "部署至边缘",
+        "description": "交付至 Cloudflare Workers，由 330+ 城市节点提供服务，零冷启动。一条命令即可推送至生产环境。"
+      },
+      "runtime": {
+        "name": "现代运行时",
+        "description": "基于 Vinext 与 Vite 运行的 Next.js App Router 和 React Server Components，带来即时的开发循环。"
+      },
+      "billing": {
+        "name": "内置账单",
+        "description": "按团队计费的 Stripe 订阅连同内嵌的 Payment Element 已全部接好，无需从零开始即可向客户收费。"
+      },
+      "ui": {
+        "name": "一套真实可用的设计系统",
+        "description": "Tailwind CSS 搭配 Shadcn 与 Base UI 组件，深色模式与响应式布局齐备，随时可扩展。"
+      },
+      "teams": {
+        "name": "团队与管理",
+        "description": "开箱即用的多租户团队、基于角色的访问控制，以及管理用户与内容的管理面板。"
+      },
+      "dx": {
+        "name": "开发者体验",
+        "description": "端到端的 TypeScript、Oxlint、博客与文档 CMS，以及无需你自己编写的 GitHub Actions 部署。"
+      }
+    },
+    "Faq": {
+      "eyebrow": "// 常见问题",
+      "heading": "疑问，在此解答",
+      "description": "还有疑问？README 涵盖了其余全部内容，issue 区也随时向你敞开。",
+      "isFree": {
+        "question": "这个模板真的免费吗？",
+        "answer": "是的，本模板完全免费且<link>开源</link>！无论个人还是商业项目，你都可以免费使用，无需任何授权费用。你可以按自己的意愿 fork、复制、修改和分发，不受任何限制，也无须署名。"
+      },
+      "featuresIncluded": {
+        "question": "包含哪些功能？",
+        "intro": "该模板包含一整套全面的功能：",
+        "item1": "邮箱/密码认证及忘记密码流程",
+        "item2": "集成 Drizzle ORM 与 Cloudflare D1 的数据库",
+        "item3": "由 Cloudflare Email Service 驱动的邮箱服务",
+        "item4": "来自 Shadcn UI 与 Tailwind CSS 的现代 UI 组件",
+        "item5": "表单校验与错误处理",
+        "item6": "深色模式支持",
+        "item7": "响应式设计",
+        "item8": "全代码库贯通的 TypeScript",
+        "item9": "基于 GitHub Actions 的自动部署",
+        "item10": "集成 Turnstile 验证码",
+        "item11": "基于 Next.js 的 SEO 优化",
+        "item12": "以及其他数不尽的功能……"
+      },
+      "techStack": {
+        "question": "技术栈是什么？",
+        "intro": "该模板采用现代而可靠的技术：",
+        "item1": "通过 Vinext 与 Vite 运行的 Next.js App Router 与 React Server Components",
+        "item2": "TypeScript 保障类型安全",
+        "item3": "Tailwind CSS 与 Shadcn UI 负责样式",
+        "item4": "DrizzleORM 搭配 Cloudflare D1 作为数据库",
+        "item5": "Lucia Auth 负责认证",
+        "item6": "Cloudflare Workers 实现无服务器部署",
+        "item7": "Cloudflare KV 存储会话",
+        "item8": "Cloudflare Email Service 发送事务性邮件"
+      },
+      "deploy": {
+        "question": "如何部署我的应用？",
+        "intro": "部署由 GitHub Actions 自动完成。你需要：",
+        "item1": "创建 Cloudflare D1 与 KV 命名空间",
+        "item2": "在 Cloudflare Email Service 中接入你的发信域名",
+        "item3": "启用 Cloudflare Images 进行图片优化",
+        "item4": "配置 Turnstile 验证码",
+        "item5": "将你的 Cloudflare API 令牌添加到 GitHub secrets",
+        "item6": "推送到 main 分支",
+        "outro": "完整的部署流程已记录在<link>GitHub 仓库</link>中。"
+      },
+      "gettingStarted": {
+        "question": "开始使用需要准备什么？",
+        "paragraph1": "你需要一个 Cloudflare 账户（免费套餐即可）、本地安装的 Node.js，以及 React 和 TypeScript 的基础知识。模板附带详细的文档，指引你完成配置。",
+        "paragraph2": "你也可以查看<link>文档</link>了解更多信息。"
+      },
+      "roadmap": {
+        "question": "即将推出哪些功能？",
+        "intro": "我们的路线图令人期待！规划中的功能包括：",
+        "item1": "多语言支持（i18n）",
+        "item2": "账单与支付处理",
+        "item3": "管理控制台",
+        "item4": "注册时验证邮箱",
+        "item5": "通知系统",
+        "item6": "Webhooks 支持",
+        "item7": "团队协作功能",
+        "item8": "实时更新",
+        "item9": "数据分析控制台"
+      },
+      "emailTemplates": {
+        "question": "邮件模板是如何处理的？",
+        "answer": "事务性邮件模板由应用渲染，并通过 Worker 上的 Cloudflare Email Service 发送。"
+      },
+      "customize": {
+        "question": "如何自定义模板？",
+        "intro": "在部署到生产环境之前，你应该：",
+        "item1": "在 <code>src/constants.ts</code> 中更新项目信息",
+        "item2": "修改 <code>src/components/footer.tsx</code> 中的页脚",
+        "item3": "可选：更新 <code>src/app/globals.css</code> 中的配色方案"
+      },
+      "contribute": {
+        "question": "我该如何贡献？",
+        "answer": "欢迎贡献！欢迎随时提出 issue、提交 pull request，或在<link>GitHub</link>上帮助改进文档。本项目遵循标准的开源贡献指南。"
+      }
+    }
+  },
+  "Legal": {
+    "Privacy": {
+      "meta": {
+        "title": "隐私政策",
+        "description": "了解我们如何收集、使用和保护您的数据"
+      },
+      "title": "隐私政策",
+      "lastUpdated": "最后更新：{date}",
+      "informationWeCollect": {
+        "heading": "1. 我们收集的信息",
+        "body": "我们收集您直接向我们提供的信息，包括但不限于您的姓名、邮箱地址，以及您选择提供的任何其他信息。"
+      },
+      "howWeUseInformation": {
+        "heading": "2. 我们如何使用您的信息",
+        "intro": "我们将所收集的信息用于：",
+        "item1": "提供、维护和改进本服务",
+        "item2": "向您发送技术通知与支持消息",
+        "item3": "回应您的评论与问题",
+        "item4": "防范欺诈与滥用"
+      },
+      "dataSecurity": {
+        "heading": "3. 数据安全",
+        "body": "我们采取合理的措施，帮助保护您的相关信息免遭丢失、窃取、滥用以及未经授权的访问、披露、篡改和销毁。"
+      },
+      "contactUs": {
+        "heading": "4. 联系我们",
+        "body": "如果您对本隐私政策有任何疑问，请通过以下方式与我们联系：",
+        "email": "邮箱：{email}"
+      },
+      "returnToHome": "返回首页"
+    },
+    "Terms": {
+      "meta": {
+        "title": "服务条款",
+        "description": "阅读我们的服务条款与使用协议"
+      },
+      "title": "服务条款",
+      "lastUpdated": "最后更新：{date}",
+      "acceptanceOfTerms": {
+        "heading": "1. 条款的接受",
+        "body": "一旦访问并使用本网站，即表示您接受并同意受本协议条款与规定的约束。"
+      },
+      "useLicense": {
+        "heading": "2. 使用许可",
+        "body": "我们仅授予您临时下载本网站材料（信息或软件）副本一份的许可，且仅供个人、非商业性的短期浏览之用。"
+      },
+      "disclaimer": {
+        "heading": "3. 免责声明",
+        "body": "本网站材料按“原样”提供。我们不作出任何明示或默示的保证，并在此声明否认所有其他保证，包括（但不限于）关于适销性、特定用途适用性，或知识产权不侵权及其他权利不受侵犯的默示保证或条件。"
+      },
+      "subscriptions": {
+        "heading": "4. 订阅与付款",
+        "body1": "付费套餐按团队以周期订阅方式计费。所有付款均通过我们的支付处理合作伙伴 Stripe 安全处理，并在每个账单周期自动续订，直至取消。",
+        "body2": "您可以随时在团队的账单设置中更改或取消套餐。取消后，您的团队可继续使用至当前账单周期结束，随后将转为免费套餐。价格与套餐可用性可能经事先通知后调整。",
+        "body3": "如提供可选的试用期，则受注册时告知的条款约束。根据您所在地区，结账时可能加收适用税费。"
+      },
+      "limitations": {
+        "heading": "5. 责任限制",
+        "body": "在任何情况下，我们或我们的供应商均不对因使用或无法使用本网站材料而产生的任何损害（包括但不限于数据或利润损失，或业务中断造成的损害）承担责任。"
+      },
+      "returnToHome": "返回首页"
+    }
+  },
+  "Footer": {
+    "legal": "法律",
+    "company": "公司",
+    "social": "社交媒体",
+    "termsOfService": "服务条款",
+    "privacyPolicy": "隐私政策",
+    "home": "首页",
+    "allRightsReserved": "保留所有权利。",
+    "builtBy": "构建方"
+  },
+  "Blog": {
+    "Common": {
+      "postCount": "{count, plural, =1 {1 篇文章} other {# 篇文章}}"
+    },
+    "ListPage": {
+      "meta": {
+        "title": "博客",
+        "titleWithPage": "博客 - 第 {page} 页",
+        "description": "阅读我们的最新文章与动态"
+      },
+      "title": "博客",
+      "description": "阅读我们的最新文章与动态",
+      "browseByTags": "按标签浏览",
+      "browseByAuthors": "按作者浏览",
+      "empty": "暂无已发布的博客文章。"
+    },
+    "Post": {
+      "backToBlog": "← 返回博客",
+      "updated": "更新于：{date}",
+      "onThisPage": "本页内容"
+    },
+    "Authors": {
+      "meta": {
+        "title": "博客作者",
+        "description": "按作者浏览博客文章"
+      },
+      "title": "博客作者",
+      "description": "认识内容背后的作者",
+      "backToBlog": "← 返回博客",
+      "empty": "未找到作者。"
+    },
+    "AuthorDetail": {
+      "meta": {
+        "title": "{name} - 博客作者",
+        "description": "浏览 {name} 的博客文章",
+        "notFound": "未找到作者"
+      },
+      "unknownAuthor": "未知作者",
+      "backToAuthors": "← 返回全部作者"
+    },
+    "Tags": {
+      "meta": {
+        "title": "博客标签",
+        "description": "按标签浏览博客文章"
+      },
+      "title": "博客标签",
+      "description": "按主题浏览文章",
+      "backToBlog": "← 返回博客",
+      "empty": "未找到标签。"
+    },
+    "TagDetail": {
+      "meta": {
+        "title": "{name} - 博客标签",
+        "description": "浏览带有 {name} 标签的博客文章",
+        "notFound": "未找到标签"
+      },
+      "backToTags": "← 返回全部标签",
+      "empty": "该标签下暂无博客文章。"
+    }
+  },
+  "Breadcrumb": {
+    "home": "首页",
+    "blog": "博客"
+  },
+  "OgImage": {
+    "blog": "博客",
+    "docs": "文档",
+    "apiReference": "API 参考",
+    "legal": "法律",
+    "account": "账户",
+    "tags": "主题",
+    "authors": "作者"
+  },
+  "Emails": {
+    "Common": {
+      "greeting": "您好，{username}：",
+      "fallbackText": "如果上面的按钮无法使用，请将此 URL 复制并粘贴到浏览器中：",
+      "footerText": "这是来自 {siteDomain} 的自动消息，请勿直接回复此邮箱。"
+    },
+    "PasswordReset": {
+      "subject": "重置您在 {siteDomain} 的密码",
+      "title": "重置您的 {siteDomain} 密码",
+      "intro": "我们收到了重置您的 {siteDomain} 账户密码的请求。请点击下方按钮设置新密码。出于安全考虑，此链接将在 1 小时后失效。",
+      "buttonLabel": "重置密码",
+      "secondaryText": "如果您没有申请此次密码重置，可以放心忽略此邮件。您的 {siteDomain} 账户密码将保持不变。",
+      "footerText": "这是来自 {siteDomain} 的自动消息。如果您并未申请此邮件，请忽略它；如有疑虑，请联系支持团队。"
+    },
+    "EmailVerification": {
+      "subject": "验证您在 {siteDomain} 的邮箱",
+      "title": "验证您的 {siteDomain} 邮箱",
+      "intro": "感谢您注册 {siteDomain}！我们需要验证您的邮箱地址以完成注册。请点击下方按钮验证您的邮箱地址。",
+      "buttonLabel": "验证邮箱地址",
+      "secondaryText": "此验证链接将在 {expirationHours, plural, =1 {1 小时} other {# 小时}}后失效。届时，您需要重新申请一封验证邮件。",
+      "fallbackText": "如果您没有在 {siteDomain} 创建账户，可以放心忽略此邮件。"
+    },
+    "TeamInvitation": {
+      "subject": "您已被邀请加入 {siteDomain} 上的一个团队",
+      "title": "您已被邀请加入 {siteDomain} 上的一个团队",
+      "greeting": "您好：",
+      "intro": "{inviterName} 邀请您加入 {siteDomain} 上的“{teamName}”团队。",
+      "buttonLabel": "接受邀请",
+      "secondaryText": "此邀请已发送至 {recipientEmail}。如果您还没有账户，可在接受邀请时创建一个。",
+      "fallbackText": "如果您没有料到会收到此团队的邀请，可以放心忽略此邮件。"
+    }
+  }
+}

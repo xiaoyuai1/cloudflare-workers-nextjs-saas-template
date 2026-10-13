@@ -4,6 +4,7 @@ import { SITE_NAME, SITE_URL } from "@/constants";
 import { EMAIL_LOGO } from "@/constants/logo";
 import { LOGO_VERSION } from "@/constants/logo-version";
 import { DEFAULT_LOCALE, LOCALES } from "@/i18n/config";
+import { localizedPathname } from "@/i18n/localized-pathname";
 import { CATALOG_LOADERS, loadCatalog } from "@/i18n/message-catalogs";
 import { EMAIL_TEMPLATE_TYPES, type EmailSendJobPayload } from "@/lib/scheduler/jobs";
 
@@ -113,6 +114,25 @@ describe("transactional email", () => {
     expect(renderedEmail.html).toContain("/es/reset-password?token=");
   });
 
+  // The default locale is served bare (no prefix) and every other locale is prefixed, so the
+  // assertions below derive both spellings from `localizedPathname` instead of assuming English.
+  test("renders the password reset email in the default locale without a URL prefix", async () => {
+    const renderedEmail = await renderTransactionalEmail({
+      to: "user@example.com",
+      template: EMAIL_TEMPLATE_TYPES.PASSWORD_RESET,
+      locale: DEFAULT_LOCALE,
+      data: {
+        resetToken: "reset-token",
+        username: "Ana",
+      },
+    });
+
+    expect(renderedEmail.html).toContain(`<html lang="${DEFAULT_LOCALE}">`);
+    expect(renderedEmail.subject).not.toContain("Reset your password");
+    expect(renderedEmail.html).toContain("/reset-password?token=");
+    expect(renderedEmail.html).not.toContain(`/${DEFAULT_LOCALE}/reset-password?token=`);
+  });
+
   test("renders the password reset email in English when the payload locale is en", async () => {
     const renderedEmail = await renderTransactionalEmail({
       to: "user@example.com",
@@ -124,12 +144,15 @@ describe("transactional email", () => {
       },
     });
 
+    // `en` only reads like the bare default while it IS the default; the prefix follows
+    // `localizedPathname`, so derive it instead of assuming either spelling.
+    const enPath = localizedPathname({ pathname: "/reset-password", locale: "en" });
+
     expect(renderedEmail.html).toContain('<html lang="en">');
     expect(renderedEmail.html).toContain("Reset your");
     expect(renderedEmail.html).toContain("Hi Ana,");
     expect(renderedEmail.subject).toContain("Reset your password");
-    expect(renderedEmail.html).toContain("/reset-password?token=");
-    expect(renderedEmail.html).not.toContain("/en/reset-password?token=");
+    expect(renderedEmail.html).toContain(`${enPath}?token=`);
   });
 
   test("falls back to the default locale for an unknown payload locale", async () => {

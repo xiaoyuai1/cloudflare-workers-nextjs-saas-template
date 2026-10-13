@@ -1,11 +1,12 @@
 import { formatDistanceToNow } from "date-fns";
-import { enUS, es } from "date-fns/locale";
+import { enUS, es, zhCN } from "date-fns/locale";
 
 import { DEFAULT_TIME_ZONE, type Locale } from "@/i18n/config";
 
 const DATE_FNS_LOCALES = {
   en: enUS,
   es,
+  zh: zhCN,
 } as const satisfies Record<Locale, typeof enUS>;
 
 // `locale` is required (no default) so TypeScript surfaces every call site

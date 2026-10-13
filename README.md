@@ -150,7 +150,7 @@ Vinext is not a fork of Next.js and is not affiliated with Vercel. It is still e
   - 🔗 Localized URLs: the default locale is served bare, every other locale is prefixed
   - 🍪 Locale from the URL prefix, then the cookie, then `Accept-Language`
   - 🔀 Locale switcher in the footer
-  - 🗂️ JSON message catalogs (English and Spanish included)
+  - 🗂️ JSON message catalogs (English, Spanish, and Simplified Chinese included)
   - 🔒 Type-safe message keys
 
 ## Internationalization (i18n)

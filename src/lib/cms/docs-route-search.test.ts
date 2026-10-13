@@ -7,6 +7,7 @@ import { INDEXED_DOCS_ROUTES } from "@/constants/docs-routes";
 import { DEFAULT_LOCALE, LOCALES, type Locale } from "@/i18n/config";
 import { loadCatalog } from "@/i18n/message-catalogs";
 import type { MessageTree } from "@/i18n/message-catalogs";
+import { tokenizeIndexText } from "@/lib/cms/search-tokens";
 import { FIXTURE_API_OPERATION } from "../../../tests/fixtures/api-openapi-document";
 
 vi.mock("server-only", () => ({}));
@@ -30,7 +31,27 @@ async function docsNamespace({ locale, namespace }: { locale: Locale; namespace:
 }
 
 function firstWordOf(text: string): string {
-  return text.toLowerCase().match(/[a-z0-9]+/g)?.[0] ?? "";
+  return tokenizeIndexText(text)[0] ?? "";
+}
+
+/** Every `*Body` string of a namespace, joined the way the index joins them. */
+function collectBodyText(tree: MessageTree): string {
+  const parts: string[] = [];
+
+  for (const [key, value] of Object.entries(tree)) {
+    if (Array.isArray(value)) {
+      continue;
+    }
+    if (typeof value === "string") {
+      if (/Body$/.test(key)) {
+        parts.push(value);
+      }
+      continue;
+    }
+    parts.push(collectBodyText(value));
+  }
+
+  return parts.filter(Boolean).join(" ");
 }
 
 function search({ query, locale = DEFAULT_LOCALE }: { query: string; locale?: Locale }) {
@@ -64,13 +85,19 @@ describe("docs route search", () => {
 
   test("matches prose inside a section body, snippeting around the hit", async () => {
     const auth = await docsNamespace({ locale: DEFAULT_LOCALE, namespace: "Auth" });
-    const bodyWords = (auth.keysBody as string).split(" ");
-    const query = bodyWords.slice(4, 7).join(" ");
+    // Tokenized, not whitespace-split: CJK copy holds few spaces, so whitespace words
+    // undercount it and a token run is what the index actually matches on.
+    const bodyTokens = tokenizeIndexText(auth.keysBody as string);
+    const query = bodyTokens.slice(1, 4).join(" ");
 
     const [result] = await search({ query });
 
+    // The snippet window covers the whole document body (every *Body string joined), not the one
+    // section the query hit, so the ceiling is the full namespace body, not `keysBody`.
+    const fullBody = collectBodyText(auth);
+
     expect(result.snippet.toLowerCase()).toContain(firstWordOf(query));
-    expect(result.snippet.length).toBeLessThan((auth.keysBody as string).length);
+    expect(result.snippet.length).toBeLessThan(fullBody.length);
   });
 
   // Nested keys are the content: `ApiErrors.codes` is keyed by the error codes a caller reads off a

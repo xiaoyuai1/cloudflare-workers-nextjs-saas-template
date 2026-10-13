@@ -15,6 +15,7 @@ type MessageCatalog = typeof import("./messages/en.json");
 export const CATALOG_LOADERS = {
   en: async () => (await import("./messages/en.json")).default,
   es: async () => (await import("./messages/es.json")).default,
+  zh: async () => (await import("./messages/zh.json")).default,
 } satisfies Record<Locale, () => Promise<MessageCatalog>>;
 
 // A locale's own catalog, held for the isolate because it is inert data; see `lazyValueByKey`.

@@ -4,7 +4,7 @@
 
 import { I18N_ENABLED } from "@/constants";
 
-export const LOCALES = ["en", "es"] as const;
+export const LOCALES = ["en", "es", "zh"] as const;
 
 export type Locale = (typeof LOCALES)[number];
 
@@ -17,7 +17,7 @@ export function isKnownLocale(value: string): value is Locale {
 
 // Canonical locale for routing, fallbacks, CMS rows, emails, and SEO URLs.
 // Changing it also changes Drizzle defaults, so generate and apply a migration.
-export const DEFAULT_LOCALE: Locale = "en";
+export const DEFAULT_LOCALE: Locale = "zh";
 
 // The locales actually served. `LOCALES` still types the full catalog, but routing, static params, the
 // switcher, hreflang alternates, and sitemaps all derive from this narrowed set — so flipping
@@ -56,12 +56,14 @@ export const LOCALE_COOKIE_MAX_AGE = 60 * 60 * 24 * 365;
 export const LOCALE_LABELS: Record<Locale, string> = {
   en: "English",
   es: "Español",
+  zh: "简体中文",
 };
 
 // OpenGraph locale codes per app locale. Keep in sync with LOCALES.
 const LOCALE_OG_MAP: Record<Locale, string> = {
   en: "en_US",
   es: "es_ES",
+  zh: "zh_CN",
 };
 
 // Primary + alternate OpenGraph locales for the active app locale. Any page
