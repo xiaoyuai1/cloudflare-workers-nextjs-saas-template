@@ -31,7 +31,11 @@
   ],
   // Vendored shadcn kit: each file exports its full slot set so forks can use the parts the
   // template does not. The oxlint `project/no-unused-module-exports` line disables record the same choice.
-  "ignoreExports": [{ "file": "src/components/ui/**", "exports": ["*"] }],
+  "ignoreExports": [
+    { "file": "src/components/ui/**", "exports": ["*"] },
+    // The reserved EmailProvider extension point for future transports (docs/email-providers.md).
+    { "file": "src/lib/email/types.ts", "exports": ["EmailProvider"] }
+  ],
   "health": {
     "ignore": [
       // Vendored upstream rules (see tools/oxlint/anti-slop/UPSTREAM.md). Upstream owns their structure.

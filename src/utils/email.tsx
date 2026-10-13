@@ -8,6 +8,8 @@ import {
 import { EMAIL_LOGO_IMAGE } from "@/constants/logo-url";
 import { DEFAULT_LOCALE, isKnownLocale, type Locale } from "@/i18n/config";
 import { getTranslator } from "@/i18n/translator";
+import { dispatchEmail } from "@/lib/email/send";
+import { resolveEmailProvider } from "@/lib/email/resolve-provider";
 import { getCloudflareContext } from "@/utils/cloudflare-context";
 import { escapeHtml } from "@/utils/escape-html";
 import { absoluteLocalizedUrl } from "@/utils/i18n-urls";
@@ -102,45 +104,31 @@ export async function sendTransactionalEmailNow({
   text,
   type,
 }: TransactionalEmailOptions) {
-  const { env } = await getCloudflareContext();
   const { emailFrom, emailFromName, emailReplyTo } = await getEmailEnv();
-
-  // Email Sending (`send_email`) needs the Workers Paid plan, so a free-plan fork omits the
-  // EMAIL binding and the generated Env no longer declares it. The structural lookup (not a
-  // hard typed read) keeps this file compiling for both forks while the missing-binding check
-  // below still fails loudly on the paid path where a real send is expected.
-  const email = (env as { EMAIL?: { send: (message: EmailMessageBuilder) => Promise<unknown> } })
-    .EMAIL;
-
-  if (!email) {
-    throw new Error("Cloudflare Email Service binding EMAIL is not configured.");
-  }
 
   if (!emailFrom) {
     throw new Error("EMAIL_FROM is not configured.");
   }
 
-  const message: EmailMessageBuilder = {
+  // One dispatch for every transport: the Cloudflare `send_email` binding by default, or the
+  // generic SMTP provider when EMAIL_PROVIDER=smtp (see docs/email-providers.md). The provider
+  // decision itself lives in resolveEmailProvider — this function only builds the message.
+  await dispatchEmail({
     to,
     from: emailFromName
       ? {
           email: emailFrom,
           name: emailFromName,
         }
-      : emailFrom,
+      : { email: emailFrom },
     subject,
     html,
     text,
     headers: {
       "X-Transactional-Email-Type": type,
     },
-  };
-
-  if (emailReplyTo) {
-    message.replyTo = emailReplyTo;
-  }
-
-  await email.send(message);
+    ...(emailReplyTo ? { replyTo: emailReplyTo } : {}),
+  });
 }
 
 // Local delivery for every transactional email. The EMAIL binding is `remote: true`, so a queued
@@ -165,11 +153,13 @@ async function queueTransactionalEmail(payload: EmailSendJobPayload): Promise<vo
     return;
   }
 
+  // Free-plan forks without a binding and forks with an incomplete SMTP config both land on the
+  // same "unavailable" decision, so enqueueing never burns the queue's retries on a consumer
+  // that can never send — log and stop here instead.
   const { env } = await getCloudflareContext();
+  const decision = await resolveEmailProvider();
 
-  // Free-plan forks have no EMAIL binding (Email Sending needs Workers Paid). Enqueueing would
-  // only burn the queue's retries on a consumer that can never send, so log and stop here too.
-  if (!("EMAIL" in env) || !env.EMAIL) {
+  if (decision.kind === "unavailable") {
     logTransactionalEmail(await renderTransactionalEmail(payload));
 
     return;

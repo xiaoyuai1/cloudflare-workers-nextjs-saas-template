@@ -45,7 +45,7 @@ Vinext is not a fork of Next.js and is not affiliated with Vercel. It is still e
   - 💻 SQLite for Local Development
   - ⚡ Efficient Data Fetching
   - 🔍 Type-safe Queries
-- 📨 Email Service with Cloudflare Email Service
+- 📨 Email Service with Pluggable Providers (Cloudflare Email Service or any SMTP server — QQ Mail, 163, Gmail; see [`docs/email-providers.md`](docs/email-providers.md))
   - 🎨 Beautiful Email Templates
   - 👀 Email Preview Mode
   - 🔧 Local Email Development Server
@@ -331,6 +331,10 @@ Bindings worth knowing about when you fork:
 - `D1_DB`, `KV_STORE`, and `R2_BUCKET` — the app database, the shared KV namespace, and the media bucket. They were named `NEXT_TAG_CACHE_D1`, `NEXT_INC_CACHE_KV`, and `NEXT_INC_CACHE_R2_BUCKET` before; rename them in your own `wrangler.jsonc` when you merge this change. The resource ids do not change, so no data moves.
 - `OAUTH_KV` — a **second binding onto the same KV namespace** as `KV_STORE`, not a new namespace. `@cloudflare/workers-oauth-provider` hardcodes the binding name, and its keys are prefix-scoped (see `OAUTH_RESERVED_KV_PREFIXES` in `src/constants.ts`), so nothing collides with the app's own keys. Point it at your own namespace id together with `KV_STORE`.
 - The `global_fetch_strictly_public` compatibility flag is required by the OAuth provider's client-metadata fetches; leave it in place.
+
+## Transactional email providers
+
+Email sending is pluggable: the default `EMAIL_PROVIDER=cloudflare` uses the `EMAIL` `send_email` binding (Workers Paid, domain onboarded to Cloudflare Email Service), while `EMAIL_PROVIDER=smtp` sends through any SMTP server over implicit TLS on port 465 — QQ Mail, 163, Gmail, corporate relays — on any plan, with no code changes. QQ Mail setup, credentials, and limits are documented in [`docs/email-providers.md`](docs/email-providers.md). Locally, mail is never sent for either provider: it is logged to the console (see `src/utils/email.tsx`).
 
 ## Things to change and customize before deploying to production
 

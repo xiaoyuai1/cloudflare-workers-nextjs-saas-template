@@ -73,7 +73,10 @@
         "ICONIFY_API_ORIGIN": "https://api.iconify.design",
         // Email Sending (the `send_email` binding) needs the Workers Paid plan, so this deployment
         // omits the binding and no transactional email is sent; see src/utils/email.tsx. These
-        // vars stay so a paid-plan fork only has to re-add the binding.
+        // vars stay so a paid-plan fork only has to re-add the binding. A fork on any plan can
+        // also set EMAIL_PROVIDER to "smtp" and send through QQ Mail et al. over implicit TLS
+        // (docs/email-providers.md); the SMTP credentials are secrets, not vars.
+        "EMAIL_PROVIDER": "cloudflare",
         "EMAIL_FROM": "no-reply@notifications.saas.3webweb.com",
         "EMAIL_FROM_NAME": "SaaS Template",
         "EMAIL_REPLY_TO": "no-reply@notifications.saas.3webweb.com"
