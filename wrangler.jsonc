@@ -76,10 +76,10 @@
         // vars stay so a paid-plan fork only has to re-add the binding. A fork on any plan can
         // also set EMAIL_PROVIDER to "smtp" and send through QQ Mail et al. over implicit TLS
         // (docs/email-providers.md); the SMTP credentials are secrets, not vars.
-        "EMAIL_PROVIDER": "cloudflare",
-        "EMAIL_FROM": "no-reply@notifications.saas.3webweb.com",
+        "EMAIL_PROVIDER": "smtp",
+        "EMAIL_FROM": "1610269763@qq.com",
         "EMAIL_FROM_NAME": "SaaS Template",
-        "EMAIL_REPLY_TO": "no-reply@notifications.saas.3webweb.com"
+        "EMAIL_REPLY_TO": "1610269763@qq.com"
     },
     "d1_databases": [
         {
