@@ -16,6 +16,7 @@ const UPDATED_USER_COLUMNS = {
   email: userTable.email,
   firstName: userTable.firstName,
   lastName: userTable.lastName,
+  nickname: userTable.nickname,
   role: userTable.role,
   emailVerified: userTable.emailVerified,
   avatar: userTable.avatar,

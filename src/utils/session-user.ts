@@ -29,6 +29,9 @@ export async function getUserFromDB(userId: string) {
       email: true,
       firstName: true,
       lastName: true,
+      // Mobile app account page display name (AutoJs6 account module); mirrored into every
+      // bearer snapshot, so the msession me route needs no second read for it.
+      nickname: true,
       role: true,
       emailVerified: true,
       avatar: true,

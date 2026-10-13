@@ -191,7 +191,11 @@ export async function mobileRegister({
         throw new ActionError("INTERNAL_SERVER_ERROR", { key: "Client.Auth.SignUp.errorCreateSession" });
       }
     },
-    RATE_LIMITS.SIGN_UP,
+    // The route hands in the trusted client IP: `chargeBucket` falls back to Next's `headers()`
+    // when no userIdentifier is set, and that API does not exist on the plain Hono dispatch.
+    signUpIpAddress
+      ? { ...RATE_LIMITS.SIGN_UP, userIdentifier: `ip:${signUpIpAddress}` }
+      : RATE_LIMITS.SIGN_UP,
   );
 }
 
@@ -200,10 +204,14 @@ export async function mobileLogin({
   email,
   password,
   deviceId,
+  clientIp,
 }: {
   email: string;
   password: string;
   deviceId: string;
+  /** Trusted client IP from the API layer; the outer IP bucket needs it because Next's
+   * `headers()` does not exist on the plain Hono dispatch this service serves. */
+  clientIp: string | null;
 }): Promise<MobileAuthResult> {
   const canonicalEmail = normalizeEmail(email);
   const accountIdentifier = `account:${await hashToken(canonicalEmail)}`;
@@ -224,7 +232,9 @@ export async function mobileLogin({
         resetOnSuccess: true,
       },
     ),
-    RATE_LIMITS.SIGN_IN,
+    clientIp
+      ? { ...RATE_LIMITS.SIGN_IN, userIdentifier: `ip:${clientIp}` }
+      : RATE_LIMITS.SIGN_IN,
   );
 }
 

@@ -77,6 +77,7 @@ function createSession({ now }: { now: Date }) {
       id: "user-1",
       firstName: "Test",
       lastName: "User",
+      nickname: null,
       email: "user@example.com",
       role: "user",
       emailVerified: null,

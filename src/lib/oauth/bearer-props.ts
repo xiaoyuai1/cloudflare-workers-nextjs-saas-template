@@ -28,7 +28,14 @@ export interface OAuthBearerProps {
   scopes?: string[];
 }
 
-type BearerProps = ApiKeyBearerProps | OAuthBearerProps;
+// Carried for a mobile-app msession token resolved by `resolveMsessionToken` at the edge: the
+// principal is built there (KV msession + identity snapshot) and rides along as a whole.
+export interface MobileSessionBearerProps {
+  credentialKind: "mobile-session";
+  principal: ApiPrincipal;
+}
+
+type BearerProps = ApiKeyBearerProps | OAuthBearerProps | MobileSessionBearerProps;
 
 function isStringArray(value: unknown): value is string[] {
   return Array.isArray(value) && value.every((entry) => typeof entry === "string");
@@ -47,6 +54,12 @@ function readBearerProps(props: unknown): BearerProps | null {
   if (candidate.credentialKind === "api-key") {
     return isApiPrincipal(candidate.principal)
       ? { credentialKind: "api-key", principal: candidate.principal }
+      : null;
+  }
+
+  if (candidate.credentialKind === "mobile-session") {
+    return isApiPrincipal(candidate.principal)
+      ? { credentialKind: "mobile-session", principal: candidate.principal }
       : null;
   }
 
@@ -83,7 +96,10 @@ export async function principalFromBearerProps(props: unknown): Promise<ApiPrinc
     return null;
   }
 
-  return bearerProps.credentialKind === "api-key"
-    ? bearerProps.principal
-    : await getOAuthGrantPrincipal(bearerProps);
+  if (bearerProps.credentialKind === "oauth-grant") {
+    return getOAuthGrantPrincipal(bearerProps);
+  }
+
+  // api-key and mobile-session both carry their fully-built principal.
+  return bearerProps.principal;
 }

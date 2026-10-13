@@ -18,8 +18,9 @@ import {
   toMobileProfile,
 } from "@/lib/account/mobile-auth";
 import { unbindIdentity } from "@/lib/account/bindings";
-import { getIP } from "@/utils/get-IP";
-import { requireVerifiedEmail } from "@/utils/auth";
+import { __INTERNAL_TRUSTED_CLIENT_IP_HEADER } from "@/utils/trusted-client-ip";
+import { getCurrentSession } from "@/utils/auth";
+import { ActionError } from "@/lib/action-error";
 import {
   mobileRegisterSchema,
   mobileLoginSchema,
@@ -86,7 +87,9 @@ export const mobileAuthRoutes = new Hono<ApiEnv>()
         email,
         password: input.password,
         nickname: input.nickname,
-        signUpIpAddress: await getIP(),
+        // Set by `withForwardedCfHeaders` in the entrypoint; `getIP()` reads Next's `headers()`,
+        // which does not exist on the plain Hono dispatch this module serves.
+        signUpIpAddress: c.req.header(__INTERNAL_TRUSTED_CLIENT_IP_HEADER) ?? null,
       });
 
       // The service resolved the id internally; one indexed lookup here keeps the contract
@@ -124,7 +127,12 @@ export const mobileAuthRoutes = new Hono<ApiEnv>()
     }),
     apiValidator("json", mobileLoginSchema),
     async (c) => {
-      return c.json(await mobileLogin(c.req.valid("json")));
+      const input = c.req.valid("json");
+
+      return c.json(await mobileLogin({
+        ...input,
+        clientIp: c.req.header(__INTERNAL_TRUSTED_CLIENT_IP_HEADER) ?? null,
+      }));
     },
   )
   .post(
@@ -164,19 +172,20 @@ export const mobileAuthRoutes = new Hono<ApiEnv>()
       },
     }),
     async (c) => {
-      const session = await requireVerifiedEmail();
-      const personalTeamPlanExpiresAt = await getPersonalTeamPlanExpiresAt(session.user.id);
+      // Read-only profile: an unverified account still gets its own profile (the App shows the
+      // verify prompt from `emailVerified`); write operations elsewhere keep the verified gate.
+      const session = await getCurrentSession();
 
-      // The KV session user snapshot predates the nickname column, so the live row is read here.
-      const liveUser = await getDB().query.userTable.findFirst({
-        where: { id: session.user.id },
-        columns: { nickname: true },
-      });
+      if (!session) {
+        throw new ActionError("NOT_AUTHORIZED", { key: "Client.Errors.notAuthenticated" });
+      }
+
+      const personalTeamPlanExpiresAt = await getPersonalTeamPlanExpiresAt(session.user.id);
 
       const profile = toMobileProfile({
         user: {
           email: session.user.email,
-          nickname: liveUser?.nickname ?? null,
+          nickname: session.user.nickname ?? null,
           firstName: session.user.firstName ?? null,
           lastName: session.user.lastName ?? null,
           avatar: session.user.avatar ?? null,
@@ -205,7 +214,15 @@ export const mobileAuthRoutes = new Hono<ApiEnv>()
     }),
     apiValidator("json", mobileChangePasswordSchema),
     async (c) => {
-      const session = await requireVerifiedEmail();
+      // Credential management, not a content feature: the same unverified-tolerant semantics as
+      // sign-in. An account that cannot sign in to its mail cannot verify either — the gate here
+      // would lock it out permanently.
+      const session = await getCurrentSession();
+
+      if (!session) {
+        throw new ActionError("NOT_AUTHORIZED", { key: "Client.Errors.notAuthenticated" });
+      }
+
       const input = c.req.valid("json");
 
       await mobileChangePassword({
@@ -233,7 +250,13 @@ export const mobileAuthRoutes = new Hono<ApiEnv>()
       },
     }),
     async (c) => {
-      const session = await requireVerifiedEmail();
+      // Read-only binding list, same unverified-tolerant semantics as /auth/me.
+      const session = await getCurrentSession();
+
+      if (!session) {
+        throw new ActionError("NOT_AUTHORIZED", { key: "Client.Errors.notAuthenticated" });
+      }
+
       const rows = await getDB().query.authIdentityTable.findMany({
         where: { userId: session.user.id },
         columns: {
@@ -271,7 +294,14 @@ export const mobileAuthRoutes = new Hono<ApiEnv>()
     }),
     apiValidator("param", mobileUnbindParamSchema),
     async (c) => {
-      const session = await requireVerifiedEmail();
+      // Same credential-management semantics as change-password: unbinding is not a content
+      // feature, and the floor check below already guarantees a remaining usable login.
+      const session = await getCurrentSession();
+
+      if (!session) {
+        throw new ActionError("NOT_AUTHORIZED", { key: "Client.Errors.notAuthenticated" });
+      }
+
       const { provider } = c.req.valid("param");
 
       await unbindIdentity({ userId: session.user.id, provider });

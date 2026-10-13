@@ -39,21 +39,39 @@ test("every mounted operation went through the policy declaration", () => {
 });
 
 // `scope: null` publishes an operation with an empty scope list and offers it as an MCP tool to
-// every credential, a scopeless key included. It exists for credential introspection alone, so a
-// second one has to be a deliberate edit of this list, never a forgotten field.
-test("credential introspection is the only operation that declares no scope", () => {
+// every credential, a scopeless key included. It exists for credential introspection, plus the
+// mobile-app auth handshake (AutoJs6 account module): register/login/logout run before any
+// credential exists, so no scope can be required of them. Both groups are deliberate edits of
+// this list, never a forgotten field.
+const DELIBERATELY_UNSCOPED_OPERATION_IDS = [
+  "getCredential",
+  "mobileRegister",
+  "mobileLogin",
+  "mobileLogout",
+] as const;
+
+test("only the deliberate list of operations declares no scope", () => {
   const unscoped = apiApp.routes.flatMap((route) => {
     const policy = readOperationPolicy(route.handler);
 
     return policy && policy.scope === null ? [{ method: route.method.toLowerCase(), policy }] : [];
   });
 
-  expect([...new Set(unscoped.map(({ policy }) => policy.operationId))]).toEqual(["getCredential"]);
+  expect([...new Set(unscoped.map(({ policy }) => policy.operationId))]).toEqual([
+    ...DELIBERATELY_UNSCOPED_OPERATION_IDS,
+  ]);
 
   // A grant nobody checked must never change anything, and must never address another team.
+  // The mobile auth handshake is POST by contract (table A of the account dev doc); everything
+  // else unscoped stays read-only introspection.
+  const POST_UNSCOPED = new Set(["mobileRegister", "mobileLogin", "mobileLogout"]);
+
   for (const { method, policy } of unscoped) {
-    expect(method, `${policy.operationId} declares no scope`).toBe("get");
     expect(policy.audience, `${policy.operationId} declares no scope`).toBe("any");
+
+    if (!POST_UNSCOPED.has(policy.operationId)) {
+      expect(method, `${policy.operationId} declares no scope`).toBe("get");
+    }
   }
 });
 

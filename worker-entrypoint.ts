@@ -22,6 +22,7 @@ import {
   MARKDOWN_EXTENSION,
   MCP_PATH,
   OAUTH_AUTHORIZE_PATH,
+  MOBILE_AUTH_PUBLIC_PATHS,
   OAUTH_ISSUANCE_THROTTLED_METHODS,
   OAUTH_PROTECTED_RESOURCE_PATH,
   OAUTH_REGISTER_PATH,
@@ -372,13 +373,14 @@ const oauthProvider = new OAuthProvider<Env>({
   apiHandlers,
   defaultHandler: nextAppHandler,
   // Imported here rather than at startup: the KV/D1 lookup chain is only reachable by a request
-  // that actually carries an API key, which no page request does.
+  // that actually carries a credential, which no page request does. API keys keep their shape
+  // sniff; an msession token is plain base64url, so it is tried when the key sniff refuses.
   resolveExternalToken: async ({ token }) => {
-    if (!looksLikeApiKey(token)) {
-      return null;
+    if (looksLikeApiKey(token)) {
+      return (await import("./src/lib/oauth/edge/external-token")).resolveApiKeyToken(token);
     }
 
-    return (await import("./src/lib/oauth/edge/external-token")).resolveApiKeyToken(token);
+    return (await import("./src/lib/oauth/edge/external-token-msession")).resolveMsessionToken(token);
   },
 });
 
@@ -554,6 +556,15 @@ async function handleEarlyEdgeRequest({
   }
 
   return null;
+}
+
+// The mobile auth handshake (AutoJs6 account module) must reach the Hono app without a bearer
+// credential, and the OAuth provider 401s every anonymous API request before Hono runs. These
+// paths are therefore answered ahead of the provider: same Hono app, so the apiAuth middleware
+// and the anonymous rate limiter still apply — only the provider's bearer gate is skipped. The
+// path set lives in `MOBILE_AUTH_PUBLIC_PATHS`; the route-policy audit re-pins the operations.
+function isMobileAuthPublicPath(pathname: string): boolean {
+  return MOBILE_AUTH_PUBLIC_PATHS.includes(pathname as (typeof MOBILE_AUTH_PUBLIC_PATHS)[number]);
 }
 
 // Both ways to ask for Markdown, in the order they must be tried. The negotiated redirect is the
@@ -740,6 +751,15 @@ async function handleFetch({
     if (throttled) {
       return throttled;
     }
+  }
+
+  // The mobile auth handshake goes to the Hono app directly: the provider would 401 it for
+  // having no bearer token, which is exactly the state a register/login/logout caller is in.
+  // The anonymous throttle above still covers these POSTs.
+  if (isMobileAuthPublicPath(pathname)) {
+    const response = await apiHandler.fetch(forwarded, env, ctx);
+
+    return finishAppResponse({ request: forwarded, url, ctx, response, edgeHtmlPage });
   }
 
   // The provider owns /oauth/token, /oauth/register, both discovery documents, and bearer

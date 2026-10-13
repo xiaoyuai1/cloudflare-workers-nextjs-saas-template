@@ -4,7 +4,7 @@ import type { Context, MiddlewareHandler } from "hono";
 
 import { enforceAnonRateLimit } from "@/api/middleware/rate-limit";
 import type { ApiEnv } from "@/api/types";
-import { API_KEY_PREFIX_LIVE, OAUTH_PROTECTED_RESOURCE_PATH } from "@/constants";
+import { API_KEY_PREFIX_LIVE, MOBILE_AUTH_PUBLIC_PATHS, OAUTH_PROTECTED_RESOURCE_PATH } from "@/constants";
 import { ActionError } from "@/lib/action-error";
 import { actionErrorToProblem, toProblemResponse } from "@/lib/api/errors";
 import {
@@ -31,10 +31,38 @@ const AUTH_OUTCOMES = {
   INHERITED: "inherited",
   PROPS: "props",
   HEADER: "header",
+  PUBLIC: "public",
   MISSING: "missing",
   MALFORMED: "malformed",
   INVALID: "invalid",
 } as const;
+
+// The anonymous placeholder for the deliberately-public mobile auth handshake. It grants nothing
+// (`profile:read` etc. are enforced from `scopes` by every real guard), it only exists so the
+// union type and the `runWithPrincipal` bridge stay uniform; the public routes' `scope: null`
+// guard asserts a principal, which this satisfies, and the handler logic is the real gate.
+const ANON_PRINCIPAL: ApiPrincipal = {
+  kind: "mobile-session",
+  userId: "",
+  user: {
+    id: "",
+    email: null,
+    firstName: null,
+    lastName: null,
+    nickname: null,
+    avatar: null,
+    role: "user",
+    emailVerified: null,
+    preferredLocale: null,
+    createdAt: new Date(0),
+    updatedAt: new Date(0),
+    bannedAt: null,
+  },
+  teams: [],
+  scopes: [],
+  audience: { type: "personal" },
+  deviceId: "",
+};
 
 const BEARER_SCHEME = "Bearer ";
 const MISSING_CREDENTIAL_DETAIL = "A bearer credential is required.";
@@ -100,6 +128,15 @@ export const apiAuth: MiddlewareHandler<ApiEnv> = async (c, next) => {
     return result.response;
   }
 
+  // The anonymous mobile-auth handshake publishes its placeholder into both stores: the context
+  // copy feeds the authed rate limiter, and the ALS copy is what the route's `scope: null` guard
+  // (requirePrincipal) reads. Its empty userId/deviceId collapse the pre-credential traffic onto
+  // one shared bucket, which is the intended treatment.
+  if (result.outcome === AUTH_OUTCOMES.PUBLIC) {
+    c.set("principal", result.principal);
+    return runWithPrincipal(result.principal, () => next());
+  }
+
   c.set("principal", result.principal);
 
   // An inherited principal is already in scope; the other doors publish theirs here.
@@ -115,6 +152,16 @@ async function resolveApiAuth(c: Context<ApiEnv>): Promise<ApiAuthResult> {
 
   if (inherited) {
     return { outcome: AUTH_OUTCOMES.INHERITED, principal: inherited };
+  }
+
+  // The mobile auth handshake (register/login/logout) runs before any credential exists. The
+  // edge already answered these ahead of the OAuth provider; on a direct Hono dispatch the
+  // missing-principal refusal below would be wrong, so they pass through anonymously and the
+  // route's own guard (scope: null + handler logic) is the gate.
+  const pathname = new URL(c.req.raw.url).pathname;
+
+  if (MOBILE_AUTH_PUBLIC_PATHS.includes(pathname as (typeof MOBILE_AUTH_PUBLIC_PATHS)[number])) {
+    return { outcome: AUTH_OUTCOMES.PUBLIC, principal: ANON_PRINCIPAL };
   }
 
   // In production the OAuth provider has already validated the credential and put its props on
@@ -202,6 +249,7 @@ async function resolveApiAuth(c: Context<ApiEnv>): Promise<ApiAuthResult> {
 type ApiAuthResult =
   | { outcome: typeof AUTH_OUTCOMES.INHERITED; principal: ApiPrincipal }
   | { outcome: typeof AUTH_OUTCOMES.PROPS | typeof AUTH_OUTCOMES.HEADER; principal: ApiPrincipal }
+  | { outcome: typeof AUTH_OUTCOMES.PUBLIC; principal: ApiPrincipal }
   | {
       outcome: typeof AUTH_OUTCOMES.MISSING | typeof AUTH_OUTCOMES.MALFORMED | typeof AUTH_OUTCOMES.INVALID;
       response: Response;

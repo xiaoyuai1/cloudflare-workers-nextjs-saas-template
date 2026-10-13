@@ -42,6 +42,15 @@ export const CURRENT_API_KEY_CACHE_VERSION = 3;
 // Public machine API (Hono app in `src/api/`). The base path is edge-routed in
 // `worker-entrypoint.ts`, is the OpenAPI `servers` entry, and is what the docs UI reads.
 export const API_V1_BASE_PATH = "/api/v1";
+// Mobile-app auth handshake (AutoJs6 account module): the endpoints a caller hits before any
+// credential exists. Edge-routed around the OAuth provider's bearer challenge — the provider
+// 401s every anonymous API request before the Hono app could even see it — and re-pinned by the
+// route-policy audit (DELIBERATELY_UNSCOPED_OPERATION_IDS).
+export const MOBILE_AUTH_PUBLIC_PATHS = [
+  `${API_V1_BASE_PATH}/auth/register`,
+  `${API_V1_BASE_PATH}/auth/login`,
+  `${API_V1_BASE_PATH}/auth/logout`,
+] as const;
 export const LLMS_TXT_PATH = "/llms.txt";
 // File-local: `LLMS_DESCRIBED_BY_RELATION.href` is the one URL every consumer reads.
 const LLMS_TXT_URL = `${SITE_URL}${LLMS_TXT_PATH}`;

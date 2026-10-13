@@ -87,6 +87,7 @@ function createSession({ role }: { role: "admin" | "user" }) {
       id: "user-1",
       firstName: "Test",
       lastName: "User",
+      nickname: null,
       email: "user@example.com",
       role,
       emailVerified: null,

@@ -189,6 +189,15 @@ test("every operation declares a scope from the catalog for both schemes", () =>
 // An unscoped operation answers a caller whose grant nobody has checked, so it must not be able to
 // change anything. This is what keeps `scope: null` from becoming a way to mount an unguarded
 // write: introspection is the reason the escape hatch exists, and a GET is all introspection needs.
+// The mobile auth handshake (AutoJs6 account module) is the one deliberate exception — its POSTs
+// run before any credential exists and mint the caller's own session; the allowlist is re-pinned
+// by the route-policy audit.
+const UNSCOPED_WRITE_OPERATIONS = new Set([
+  `${API_V1_BASE_PATH}/auth/register`,
+  `${API_V1_BASE_PATH}/auth/login`,
+  `${API_V1_BASE_PATH}/auth/logout`,
+]);
+
 test("an operation that declares no scope is read-only", () => {
   for (const { path, method, operation } of operations()) {
     if (path === API_OPENAPI_SPEC_PATH) {
@@ -199,7 +208,7 @@ test("an operation that declares no scope is read-only", () => {
       (requirement) => Object.values(requirement).some((scopes) => scopes.length === 0),
     );
 
-    if (isUnscoped) {
+    if (isUnscoped && !UNSCOPED_WRITE_OPERATIONS.has(path)) {
       expect(method, `${method} ${path} declares no scope`).toBe("get");
     }
   }
