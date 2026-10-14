@@ -72,7 +72,7 @@ export function toMobileProfile({
     dateExpired: personalTeamPlanExpiresAt ? personalTeamPlanExpiresAt.toISOString() : null,
     // While the verification gate is off (EMAIL_VERIFICATION_REQUIRED=false), the mobile app
     // treats every account as verified: the badge would nag about a flow that cannot complete.
-    emailVerified: EMAIL_VERIFICATION_REQUIRED || user.emailVerified !== null,
+    emailVerified: EMAIL_VERIFICATION_REQUIRED ? user.emailVerified !== null : true,
   };
 }
 
