@@ -247,6 +247,47 @@ export const membershipGrantTable = sqliteTable("membership_grant", {
   uniqueIndex('membership_grant_source_ref_unique').on(table.source, table.refId),
 ]));
 
+// ---------------------------------------------------------------------------
+// Project publishing & review (AutoJs6 account module P3).
+// One row per published package; a new version overwrites the frozen fields
+// in place and flips the row back to `reviewing`. Statuses are plain text:
+// extending the machine must not rebuild the table. The zip lives in R2
+// under PROJECT_R2_BASE_PATH; the row only names it (r2Key).
+// ---------------------------------------------------------------------------
+
+/** A user-published script package awaiting/undergoing/past review. */
+export const projectTable = sqliteTable("project", {
+  ...commonColumns,
+  // Runtime default instead of commonColumns' SQL DEFAULT: new tables must not introduce
+  // database-level defaults (see CLAUDE.md D1 schema-change safety).
+  updateCounter: integer().$defaultFn(() => 0).$onUpdate(() => sql`updateCounter + 1`),
+  id: text().primaryKey().$defaultFn(() => `proj_${createRandomId()}`).notNull(),
+  // The app's package identity; UNIQUE — the ownership CAS below is the claim gate, this index
+  // is the fast lookup for "package name taken by someone else".
+  packageName: text({ length: 255 }).notNull(),
+  name: text({ length: 255 }).notNull(),
+  summary: text({ length: 1000 }),
+  // AutoJsPro-style category and comma-separated tags; plain text for the no-rebuild reason.
+  category: text({ length: 50 }).notNull(),
+  tags: text({ length: 500 }),
+  // Frozen at upload: the version being reviewed (or live).
+  versionCode: integer().notNull(),
+  versionName: text({ length: 100 }).notNull(),
+  sizeBytes: integer().notNull(),
+  r2Key: text({ length: 500 }).notNull(),
+  userId: text().notNull().references(() => userTable.id),
+  // reviewing | published | rejected | delisted. The CAS transitions carry the real semantics.
+  status: text({ length: 50 }).notNull(),
+  // Staff answer on a rejection; mailed to the author.
+  rejectReason: text({ length: 1000 }),
+  downloads: integer().notNull(),
+}, (table) => ([
+  uniqueIndex('project_package_name_unique').on(table.packageName),
+  index('project_user_idx').on(table.userId),
+  index('project_status_idx').on(table.status),
+  index('project_category_idx').on(table.category),
+]));
+
 /** A purchased membership. P2 ships the card-key channel; online payments land in P2.5
  * reusing the same state machine (PENDING → PAID → COMPLETED, CAS on status). */
 export const billingOrderTable = sqliteTable("billing_order", {
@@ -760,6 +801,7 @@ const relationSchema = {
   membershipPlanTable,
   oauthAppTable,
   passKeyCredentialTable,
+  projectTable,
   scheduledJobTable,
   teamInvitationTable,
   teamMembershipTable,
@@ -1012,6 +1054,10 @@ export const relations = defineRelations(relationSchema, (r) => ({
       from: r.userTable.id,
       to: r.cardKeyBatchTable.createdBy,
     }),
+    projects: r.many.projectTable({
+      from: r.userTable.id,
+      to: r.projectTable.userId,
+    }),
     ownedOAuthApps: r.many.oauthAppTable({
       from: r.userTable.id,
       to: r.oauthAppTable.ownerUserId,
@@ -1107,6 +1153,13 @@ export const relations = defineRelations(relationSchema, (r) => ({
       optional: true,
     }),
   },
+  projectTable: {
+    user: r.one.userTable({
+      from: r.projectTable.userId,
+      to: r.userTable.id,
+      optional: false,
+    }),
+  },
 }));
 
 // oxlint-disable-next-line project/no-unused-module-exports -- Drizzle schema model types are exported as app/tooling contracts.
@@ -1159,3 +1212,5 @@ export type BillingOrder = InferSelectModel<typeof billingOrderTable>;
 export type CardKey = InferSelectModel<typeof cardKeyTable>;
 // oxlint-disable-next-line project/no-unused-module-exports -- Drizzle schema model types are exported as app/tooling contracts.
 export type CardKeyBatch = InferSelectModel<typeof cardKeyBatchTable>;
+// oxlint-disable-next-line project/no-unused-module-exports -- Drizzle schema model types are exported as app/tooling contracts.
+export type Project = InferSelectModel<typeof projectTable>;

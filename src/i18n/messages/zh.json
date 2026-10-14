@@ -16,7 +16,9 @@
       "billing:read": "读取你团队的订阅和账单状态。",
       "api-keys:read": "列出你账户上的 API 密钥及其最近使用时间。",
       "api-keys:write": "创建和撤销你账户上的 API 密钥。",
-      "billing:write": "兑换会员卡密并管理你的计费订单。"
+      "billing:write": "兑换会员卡密并管理你的计费订单。",
+      "projects:read": "浏览项目市场并列出你已发布的项目。",
+      "projects:write": "发布项目版本、更新它们并删除你的项目。"
     },
     "ApiScopeSummary": {
       "fullAccess": "完全访问权限",

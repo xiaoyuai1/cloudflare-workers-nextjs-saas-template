@@ -50,6 +50,14 @@ export const API_SCOPES = {
     description: "Redeem membership card keys and manage your billing orders.",
     accountOnly: true,
   },
+  "projects:read": {
+    description: "Browse the project market and list your own published projects.",
+    accountOnly: true,
+  },
+  "projects:write": {
+    description: "Publish project versions, update them, and delete your projects.",
+    accountOnly: true,
+  },
   "api-keys:read": {
     description: "List the API keys on your account and when they were last used.",
     accountOnly: true,

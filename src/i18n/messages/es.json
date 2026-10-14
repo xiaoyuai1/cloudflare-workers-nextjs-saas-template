@@ -16,7 +16,9 @@
       "billing:read": "Leer el estado de suscripción y facturación de tus equipos.",
       "api-keys:read": "Ver las claves de API de tu cuenta y cuándo se usaron por última vez.",
       "api-keys:write": "Crear y revocar claves de API en tu cuenta.",
-      "billing:write": "Canjea llaves de tarjeta de membresía y gestiona tus pedidos de facturación."
+      "billing:write": "Canjea llaves de tarjeta de membresía y gestiona tus pedidos de facturación.",
+      "projects:read": "Explorar el mercado de proyectos y listar tus proyectos publicados.",
+      "projects:write": "Publicar versiones de proyectos, actualizarlos y eliminar tus proyectos."
     },
     "ApiScopeSummary": {
       "fullAccess": "Acceso completo",

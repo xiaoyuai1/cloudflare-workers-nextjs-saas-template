@@ -58,6 +58,19 @@ const UNBAN_NOTICE_COPY = {
   footer: `This is an automated message from ${SITE_DOMAIN}.`,
 } as const;
 
+// Project-review rejection (AutoJs6 account module P3): fixed-locale copy like the ban
+// notices, so no catalog entry is needed and the payload stays catalog-free.
+const PROJECT_REJECTED_NOTICE_COPY = {
+  title: `Your ${SITE_NAME} project needs changes`,
+  intro: (projectName: string) =>
+    `Your project "${projectName}" was reviewed and not approved yet. The reviewer left the ` +
+    "reason below.",
+  secondary: (packageName: string, versionName: string) =>
+    `Package: ${packageName} · Version: ${versionName}. Open the app, go to My projects, and ` +
+    "upload a new version when ready.",
+  footer: `This is an automated message from ${SITE_DOMAIN}.`,
+};
+
 // The queue consumer has no request context (no cookies/headers), so it takes `getTranslator`,
 // which needs none.
 async function getEmailTranslator(locale: string) {
@@ -404,6 +417,31 @@ export async function renderTransactionalEmail(
         type: payload.template,
       };
     }
+    case EMAIL_TEMPLATE_TYPES.PROJECT_REJECTED_NOTICE: {
+      // No `cta`: the author acts in the app (My projects → upload a new version), not on the
+      // web. Fixed-locale copy like the ban notices — the App is zh-first and this rides the
+      // same simple-notice tone.
+      const emailTemplate = buildEmailTemplate({
+        locale: BAN_EMAIL_LOCALE,
+        title: PROJECT_REJECTED_NOTICE_COPY.title,
+        greeting: "Hi,",
+        intro: PROJECT_REJECTED_NOTICE_COPY.intro(payload.data.projectName),
+        details: `Reason: ${payload.data.reason}`,
+        secondaryText: PROJECT_REJECTED_NOTICE_COPY.secondary(
+          payload.data.packageName,
+          payload.data.versionName,
+        ),
+        footerText: PROJECT_REJECTED_NOTICE_COPY.footer,
+      });
+
+      return {
+        to: payload.to,
+        subject: PROJECT_REJECTED_NOTICE_COPY.title,
+        html: emailTemplate.html,
+        text: emailTemplate.text,
+        type: payload.template,
+      };
+    }
   }
 }
 
@@ -516,5 +554,26 @@ export async function sendUnbanNoticeEmail({
     to: email,
     template: EMAIL_TEMPLATE_TYPES.UNBAN_NOTICE,
     data: { username, externalReason, cancelledSubscriptionCount },
+  });
+}
+
+// AutoJs6 account module (P3): mailed with the staff-written rejection reason, verbatim.
+export async function sendProjectRejectedNoticeEmail({
+  email,
+  projectName,
+  packageName,
+  versionName,
+  reason,
+}: {
+  email: string;
+  projectName: string;
+  packageName: string;
+  versionName: string;
+  reason: string;
+}): Promise<void> {
+  await queueTransactionalEmail({
+    to: email,
+    template: EMAIL_TEMPLATE_TYPES.PROJECT_REJECTED_NOTICE,
+    data: { projectName, packageName, versionName, reason },
   });
 }

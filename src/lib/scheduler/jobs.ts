@@ -18,6 +18,7 @@ export const EMAIL_TEMPLATE_TYPES = {
   TEAM_INVITATION: "team-invitation",
   BAN_NOTICE: "ban-notice",
   UNBAN_NOTICE: "unban-notice",
+  PROJECT_REJECTED_NOTICE: "project-rejected-notice",
 } as const;
 
 const nonEmptyString = v.pipe(v.string(), v.minLength(1));
@@ -106,12 +107,26 @@ const unbanNoticeEmailJobPayloadSchema = v.object({
   }),
 });
 
+// Project-review rejection (AutoJs6 account module P3): the staff-written reason, sent to the
+// author. Fixed-locale copy like the ban notices (see src/utils/email.tsx).
+const projectRejectedNoticeEmailJobPayloadSchema = v.object({
+  to: nonEmptyString,
+  template: v.literal(EMAIL_TEMPLATE_TYPES.PROJECT_REJECTED_NOTICE),
+  data: v.object({
+    projectName: trimmedString({ min: 1, max: 255 }),
+    packageName: trimmedString({ min: 1, max: 255 }),
+    versionName: trimmedString({ min: 1, max: 100 }),
+    reason: trimmedString({ min: 1, max: 1000 }),
+  }),
+});
+
 export const emailSendJobPayloadSchema = v.union([
   passwordResetEmailJobPayloadSchema,
   emailVerificationJobPayloadSchema,
   teamInvitationEmailJobPayloadSchema,
   banNoticeEmailJobPayloadSchema,
   unbanNoticeEmailJobPayloadSchema,
+  projectRejectedNoticeEmailJobPayloadSchema,
 ]);
 
 export type EmailSendJobPayload = v.InferOutput<typeof emailSendJobPayloadSchema>;

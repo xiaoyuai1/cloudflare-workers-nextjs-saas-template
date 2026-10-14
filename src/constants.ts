@@ -198,6 +198,31 @@ export const ADMIN_CARD_KEYS_PATH = "/admin/card-keys" satisfies Route;
 export const ADMIN_ORDERS_PATH = "/admin/orders" satisfies Route;
 /** Admin card-key generation cap per batch: 1000 rows is one comfortable D1 batch write. */
 export const CARD_KEY_BATCH_MAX_COUNT = 1000;
+
+// AutoJs6 account module (P3): project publishing & review.
+export const ADMIN_PROJECTS_PATH = "/admin/projects" satisfies Route;
+/** Every project zip lands in R2 under this prefix; the orphan sweep only lists CMS images, so
+ * these objects are never candidates. */
+export const PROJECT_R2_BASE_PATH = "projects" as const;
+/** Upload cap (20MB): comfortably above any AutoJs6 script bundle, tight enough that a single
+ * multipart request never stresses the Workers 100MB memory ceiling. */
+export const PROJECT_MAX_FILE_SIZE = 20 * 1024 * 1024;
+/** Package identity: reverse-DNS style, enforced in the project schema. */
+export const PROJECT_PACKAGE_NAME_MAX_LENGTH = 255;
+/** Categories the market filters on; AutoJsPro-style fixed set (plain-text column, so extending
+ * the list is a code change, not a migration). */
+export const PROJECT_CATEGORIES = [
+  "tools",
+  "games",
+  "automation",
+  "education",
+  "social",
+  "other",
+] as const;
+export type ProjectCategory = (typeof PROJECT_CATEGORIES)[number];
+/** Per-project tag ceiling: tags are one comma-separated column. */
+export const PROJECT_MAX_TAGS = 5;
+export const PROJECT_TAG_MAX_LENGTH = 30;
 // Gemma 4 26B (A4B, instruction-tuned): chat-completions model used for SEO descriptions and CMS
 export const DEFAULT_AI_MODEL = '@cf/google/gemma-4-26b-a4b-it' as const satisfies keyof AiModels;
 

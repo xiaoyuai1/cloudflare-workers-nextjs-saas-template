@@ -13,6 +13,7 @@ import { invitationRoutes } from "@/api/routes/invitations";
 import { memberRoutes } from "@/api/routes/members";
 import { meRoutes } from "@/api/routes/me";
 import { mobileAuthRoutes } from "@/api/routes/mobile-auth";
+import { projectsMobileRoutes } from "@/api/routes/projects-mobile";
 import { teamRoutes } from "@/api/routes/teams";
 import type { ApiApp, ApiEnv } from "@/api/types";
 import { API_OPENAPI_SPEC_METHODS, API_V1_BASE_PATH } from "@/constants";
@@ -39,6 +40,9 @@ export function registerCustomRoutes(app: ApiApp): void {
   // AutoJs6 account module (P2): membership plans, card-key redeem, order skeleton. The
   // products list is public-read; redeem/orders require the msession + billing scopes.
   app.route("/", billingMobileRoutes);
+  // AutoJs6 account module (P3): project publishing, versions, market, downloads. All endpoints
+  // require the msession + projects scopes (market visitors are App users; no edge bypass).
+  app.route("/", projectsMobileRoutes);
 }
 // oxlint-enable project/no-unused-module-exports
 

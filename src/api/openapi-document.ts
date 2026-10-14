@@ -21,6 +21,7 @@ export const API_TAGS = {
   members: "Members",
   invitations: "Invitations",
   billing: "Billing",
+  projects: "Projects",
   apiKeys: "API keys",
 } as const;
 

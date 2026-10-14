@@ -16,6 +16,7 @@ export const cardKeyBatchBaseFields = {
   expiresAt: v.optional(
     v.pipe(
       v.string(),
+      v.maxLength(10),
       v.regex(/^\d{4}-\d{2}-\d{2}$/, "invalidDate"),
     ),
   ),

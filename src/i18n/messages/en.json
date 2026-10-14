@@ -16,7 +16,9 @@
       "billing:read": "Read the subscription and billing status of your teams.",
       "api-keys:read": "List the API keys on your account and when they were last used.",
       "api-keys:write": "Create and revoke API keys on your account.",
-      "billing:write": "Redeem membership card keys and manage your billing orders."
+      "billing:write": "Redeem membership card keys and manage your billing orders.",
+      "projects:read": "Browse the project market and list your own published projects.",
+      "projects:write": "Publish project versions, update them, and delete your projects."
     },
     "ApiScopeSummary": {
       "fullAccess": "Full access",
