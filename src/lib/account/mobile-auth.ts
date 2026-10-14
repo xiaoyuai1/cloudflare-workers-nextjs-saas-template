@@ -3,6 +3,7 @@ import "server-only";
 import { eq } from "drizzle-orm";
 
 import { ActionError } from "@/lib/action-error";
+import { EMAIL_VERIFICATION_REQUIRED } from "@/constants";
 import { assertEmailNotBlocked } from "@/lib/auth/blocked-email-guard";
 import { assertNotBanned, isBanned } from "@/lib/account/ban";
 import { verifyPasswordSignIn } from "@/lib/account/password-auth";
@@ -69,7 +70,9 @@ export function toMobileProfile({
     nickname: user.nickname,
     avatar: user.avatar,
     dateExpired: personalTeamPlanExpiresAt ? personalTeamPlanExpiresAt.toISOString() : null,
-    emailVerified: user.emailVerified !== null,
+    // While the verification gate is off (EMAIL_VERIFICATION_REQUIRED=false), the mobile app
+    // treats every account as verified: the badge would nag about a flow that cannot complete.
+    emailVerified: EMAIL_VERIFICATION_REQUIRED || user.emailVerified !== null,
   };
 }
 
@@ -178,11 +181,15 @@ export async function mobileRegister({
       try {
         const result = await buildMobileAuthResult({ userId: user.id, deviceId: "registration" });
 
-        await sendUserVerificationEmail({
-          userId: user.id,
-          email: user.email,
-          username: nickname || user.email,
-        });
+        // Verification mail only while the gate is on; the off state bypasses the whole flow
+        // (user decision: run the basic account loop first, mail verification comes later).
+        if (EMAIL_VERIFICATION_REQUIRED && user.email) {
+          await sendUserVerificationEmail({
+            userId: user.id,
+            email: user.email,
+            username: nickname || user.email,
+          });
+        }
 
         return result;
       } catch (error) {
