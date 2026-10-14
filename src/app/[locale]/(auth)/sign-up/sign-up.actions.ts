@@ -1,6 +1,7 @@
 "use server";
 
 import { ActionError } from "@/lib/action-error";
+import { EMAIL_VERIFICATION_REQUIRED } from "@/constants";
 import { actionClient } from "@/lib/safe-action";
 import { getDB } from "@/db"
 import { userTable } from "@/db/schema"
@@ -69,11 +70,14 @@ export const signUpAction = actionClient
         try {
           const { preferredLocale } = await createAndStoreSession(user.id, "password");
 
-          await sendUserVerificationEmail({
-            userId: user.id,
-            email: user.email,
-            username: user.firstName || user.email,
-          });
+          // Verification mail only while the gate is on (see the mobile register twin).
+          if (EMAIL_VERIFICATION_REQUIRED) {
+            await sendUserVerificationEmail({
+              userId: user.id,
+              email: user.email,
+              username: user.firstName || user.email,
+            });
+          }
 
           return { success: true, preferredLocale };
         } catch (error) {
