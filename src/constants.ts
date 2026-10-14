@@ -50,6 +50,9 @@ export const MOBILE_AUTH_PUBLIC_PATHS = [
   `${API_V1_BASE_PATH}/auth/register`,
   `${API_V1_BASE_PATH}/auth/login`,
   `${API_V1_BASE_PATH}/auth/logout`,
+  // The recharge page's tier list renders before sign-in, so it is a public read too
+  // (AutoJs6 account module P2). GET only; the route's guard still applies behind the edge.
+  `${API_V1_BASE_PATH}/billing/products`,
 ] as const;
 export const LLMS_TXT_PATH = "/llms.txt";
 // File-local: `LLMS_DESCRIBED_BY_RELATION.href` is the one URL every consumer reads.
@@ -189,6 +192,12 @@ export const ADMIN_API_DOCS_PATH = "/admin/api" satisfies Route;
 export const ADMIN_USERS_PATH = "/admin/users" satisfies Route;
 export const ADMIN_TEAMS_PATH = "/admin/teams" satisfies Route;
 export const ADMIN_BLOCKED_EMAILS_PATH = "/admin/blocked-emails" satisfies Route;
+// AutoJs6 account module (P2): membership & card-key billing pages.
+export const ADMIN_MEMBERSHIP_PLANS_PATH = "/admin/membership-plans" satisfies Route;
+export const ADMIN_CARD_KEYS_PATH = "/admin/card-keys" satisfies Route;
+export const ADMIN_ORDERS_PATH = "/admin/orders" satisfies Route;
+/** Admin card-key generation cap per batch: 1000 rows is one comfortable D1 batch write. */
+export const CARD_KEY_BATCH_MAX_COUNT = 1000;
 // Gemma 4 26B (A4B, instruction-tuned): chat-completions model used for SEO descriptions and CMS
 export const DEFAULT_AI_MODEL = '@cf/google/gemma-4-26b-a4b-it' as const satisfies keyof AiModels;
 

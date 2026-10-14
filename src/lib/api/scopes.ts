@@ -46,6 +46,10 @@ export const API_SCOPES = {
     description: "Read the subscription and billing status of your teams.",
     accountOnly: false,
   },
+  "billing:write": {
+    description: "Redeem membership card keys and manage your billing orders.",
+    accountOnly: true,
+  },
   "api-keys:read": {
     description: "List the API keys on your account and when they were last used.",
     accountOnly: true,

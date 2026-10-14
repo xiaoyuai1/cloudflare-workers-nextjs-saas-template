@@ -15,7 +15,8 @@
       "invites:write": "发送和撤销你团队的邀请。",
       "billing:read": "读取你团队的订阅和账单状态。",
       "api-keys:read": "列出你账户上的 API 密钥及其最近使用时间。",
-      "api-keys:write": "创建和撤销你账户上的 API 密钥。"
+      "api-keys:write": "创建和撤销你账户上的 API 密钥。",
+      "billing:write": "兑换会员卡密并管理你的计费订单。"
     },
     "ApiScopeSummary": {
       "fullAccess": "完全访问权限",
@@ -1109,6 +1110,14 @@
         "description": "你要查找的博客文章不存在或已被移除。",
         "backToBlog": "返回博客"
       }
+    },
+    "Billing": {
+      "errorCardKeyNotFound": "卡密不存在",
+      "errorCardKeyUsed": "卡密已被使用",
+      "errorCardKeyExpired": "卡密已过期",
+      "errorCardKeyDisabled": "卡密已作废",
+      "errorCardKeyInvalid": "卡密格式不正确",
+      "errorOrderNotCancellable": "只有待支付订单才能取消"
     }
   },
   "Landing": {

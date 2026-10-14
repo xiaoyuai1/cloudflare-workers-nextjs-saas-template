@@ -48,6 +48,8 @@ const DELIBERATELY_UNSCOPED_OPERATION_IDS = [
   "mobileRegister",
   "mobileLogin",
   "mobileLogout",
+  // The recharge page's tier list: a public read, same deliberate shape as the handshake above.
+  "mobileListBillingProducts",
 ] as const;
 
 test("only the deliberate list of operations declares no scope", () => {

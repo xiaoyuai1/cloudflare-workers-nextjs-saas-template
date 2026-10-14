@@ -15,7 +15,8 @@
       "invites:write": "Enviar y revocar invitaciones a tus equipos.",
       "billing:read": "Leer el estado de suscripción y facturación de tus equipos.",
       "api-keys:read": "Ver las claves de API de tu cuenta y cuándo se usaron por última vez.",
-      "api-keys:write": "Crear y revocar claves de API en tu cuenta."
+      "api-keys:write": "Crear y revocar claves de API en tu cuenta.",
+      "billing:write": "Canjea llaves de tarjeta de membresía y gestiona tus pedidos de facturación."
     },
     "ApiScopeSummary": {
       "fullAccess": "Acceso completo",
@@ -1109,6 +1110,14 @@
         "description": "La entrada del blog que buscas no existe o ha sido eliminada.",
         "backToBlog": "Volver al blog"
       }
+    },
+    "Billing": {
+      "errorCardKeyNotFound": "No existe una llave de tarjeta con ese código.",
+      "errorCardKeyUsed": "Esa llave de tarjeta ya ha sido canjeada.",
+      "errorCardKeyExpired": "Esa llave de tarjeta ha expirado.",
+      "errorCardKeyDisabled": "Esa llave de tarjeta ha sido anulada.",
+      "errorCardKeyInvalid": "Ese formato de llave de tarjeta no es válido.",
+      "errorOrderNotCancellable": "Solo se puede cancelar un pedido pendiente."
     }
   },
   "Landing": {

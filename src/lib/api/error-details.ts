@@ -104,6 +104,15 @@ export const PROBLEM_DETAIL_BY_MESSAGE_KEY: Partial<
   "Client.Dashboard.Billing.errorTrialUnavailable":
     "This team is not eligible for a trial on that plan.",
   "Client.Dashboard.Billing.errorStartCheckout": "A checkout session could not be started.",
+
+  // Card-key billing (AutoJs6 account module): the redeem failures a caller can act on. The
+  // mobile app maps the same cases to its own copy; these prose forms serve API/MCP readers.
+  "Client.Billing.errorCardKeyNotFound": "No card key exists with that code.",
+  "Client.Billing.errorCardKeyUsed": "That card key has already been redeemed.",
+  "Client.Billing.errorCardKeyExpired": "That card key has expired.",
+  "Client.Billing.errorCardKeyDisabled": "That card key has been voided.",
+  "Client.Billing.errorCardKeyInvalid": "That is not a valid card key format.",
+  "Client.Billing.errorOrderNotCancellable": "Only a pending order can be cancelled.",
 };
 
 export function resolveKeyedProblemDetail({

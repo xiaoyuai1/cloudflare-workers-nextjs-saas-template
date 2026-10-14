@@ -47,6 +47,7 @@ const MAINTENANCE_TASK_LABELS = {
   excess_cms_version_purge: "excess CMS version history purge",
   expired_api_key_purge: "expired API key purge",
   expired_team_invitation_purge: "expired team invitation purge",
+  expired_billing_order_sweep: "expired billing order sweep",
   oauth_expired_cimd_prune: "OAuth expired CIMD mirror pruning",
   oauth_expired_data_purge: "OAuth expired data purge",
   oauth_maintenance: "OAuth maintenance",
@@ -246,6 +247,19 @@ async function runRetentionMaintenance({ env, now }: { env: Env; now: Date }): P
   });
 }
 
+// Card-key/online-payment orders (AutoJs6 account module): flip stale PENDING rows to EXPIRED.
+// Error-isolated like every other sweep; the CAS inside means a callback racing the sweep still
+// completes the order (P2.5 adds the provider-reconcile pass ahead of this).
+async function runBillingOrderMaintenance(now: Date): Promise<void> {
+  await runMaintenanceTask({
+    task: "expired_billing_order_sweep",
+    run: async () => {
+      const { expireStalePendingOrders } = await import("@/lib/billing/orders");
+      await expireStalePendingOrders({ now });
+    },
+  });
+}
+
 export async function handleSchedulerCron({
   env,
   now = new Date(),
@@ -260,6 +274,7 @@ export async function handleSchedulerCron({
   // the queue dispatch above — down with it.
   await Promise.all([
     runBillingMaintenance(now),
+    runBillingOrderMaintenance(now),
     runOAuthMaintenance({ env, now }),
     runRetentionMaintenance({ env, now }),
   ]);

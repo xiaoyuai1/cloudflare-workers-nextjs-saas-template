@@ -6,6 +6,7 @@ import { apiAuth } from "@/api/middleware/auth";
 import { problemJsonErrorHandler, problemJsonNotFoundHandler } from "@/api/middleware/problem-json";
 import { authedRateLimit } from "@/api/middleware/rate-limit";
 import { apiKeyRoutes } from "@/api/routes/api-keys";
+import { billingMobileRoutes } from "@/api/routes/billing-mobile";
 import { billingRoutes } from "@/api/routes/billing";
 import { credentialRoutes } from "@/api/routes/credential";
 import { invitationRoutes } from "@/api/routes/invitations";
@@ -35,6 +36,9 @@ export function registerCustomRoutes(app: ApiApp): void {
   // AutoJs6 account module (P1): mobile auth + bindings. Register/login/logout are public
   // (`scope: null`), the rest require the Bearer msession; see src/api/routes/mobile-auth.ts.
   app.route("/", mobileAuthRoutes);
+  // AutoJs6 account module (P2): membership plans, card-key redeem, order skeleton. The
+  // products list is public-read; redeem/orders require the msession + billing scopes.
+  app.route("/", billingMobileRoutes);
 }
 // oxlint-enable project/no-unused-module-exports
 

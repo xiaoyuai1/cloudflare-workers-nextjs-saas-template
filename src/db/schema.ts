@@ -207,6 +207,118 @@ export const authIdentityTable = sqliteTable("auth_identity", {
   index('auth_identity_user_idx').on(table.userId),
 ]));
 
+// ---------------------------------------------------------------------------
+// Membership & card-key billing (AutoJs6 account module P2).
+// design reference: sub2api (Wei-Shaw/sub2api, LGPL-3.0) docs/PAYMENT.md —
+// plans / orders / redeem codes; amounts are integer cents, D1 has no
+// transactions (batch only), and idempotency is the state-machine CAS alone.
+// ---------------------------------------------------------------------------
+
+/** A purchasable membership tier (月卡/季卡/...). Admin CRUD; orders freeze a snapshot row. */
+export const membershipPlanTable = sqliteTable("membership_plan", {
+  ...commonColumns,
+  // Runtime default instead of commonColumns' SQL DEFAULT: new tables must not introduce
+  // database-level defaults (see CLAUDE.md D1 schema-change safety).
+  updateCounter: integer().$defaultFn(() => 0).$onUpdate(() => sql`updateCounter + 1`),
+  id: text().primaryKey().$defaultFn(() => `mplan_${createRandomId()}`).notNull(),
+  name: text({ length: 255 }).notNull(),
+  days: integer().notNull(),
+  priceCents: integer().notNull(),
+  sortOrder: integer(),
+  enabled: integer().$defaultFn(() => 1).notNull(),
+}, (table) => ([
+  index('membership_plan_sort_idx').on(table.sortOrder),
+]));
+
+/** One membership extension per (source, refId): the UNIQUE pair is the audit-row claim that
+ * makes replays (duplicate callbacks, concurrent redeems) idempotent. */
+export const membershipGrantTable = sqliteTable("membership_grant", {
+  ...commonColumns,
+  updateCounter: integer().$defaultFn(() => 0).$onUpdate(() => sql`updateCounter + 1`),
+  id: text().primaryKey().$defaultFn(() => `mgrt_${createRandomId()}`).notNull(),
+  userId: text().notNull().references(() => userTable.id),
+  days: integer().notNull(),
+  // 'order' | 'card_key' | 'admin'. Plain text, not an enum: extending the set must not
+  // force a table rebuild.
+  source: text({ length: 50 }).notNull(),
+  refId: text({ length: 255 }).notNull(),
+}, (table) => ([
+  index('membership_grant_user_idx').on(table.userId),
+  uniqueIndex('membership_grant_source_ref_unique').on(table.source, table.refId),
+]));
+
+/** A purchased membership. P2 ships the card-key channel; online payments land in P2.5
+ * reusing the same state machine (PENDING → PAID → COMPLETED, CAS on status). */
+export const billingOrderTable = sqliteTable("billing_order", {
+  ...commonColumns,
+  updateCounter: integer().$defaultFn(() => 0).$onUpdate(() => sql`updateCounter + 1`),
+  id: text().primaryKey().$defaultFn(() => `wordr_${createRandomId()}`).notNull(),
+  // Public order number shown to the user and to payment providers; unique, retried on clash.
+  outOrderNo: text({ length: 64 }).notNull(),
+  userId: text().notNull().references(() => userTable.id),
+  // Denormalized at create time so the row stays legible after the user changes their email.
+  userEmail: text({ length: 255 }),
+  // Frozen plan snapshot: the tier the user saw when ordering, not a live foreign key.
+  productId: text({ length: 64 }),
+  productDays: integer().notNull(),
+  productSnapshot: text({ length: 2000 }),
+  amountCents: integer().notNull(),
+  // 'card_key' today; 'alipay' | 'wechat' | ... arrive with P2.5. Plain text for the same
+  // no-rebuild reason as auth_identity.providerType.
+  channel: text({ length: 50 }).notNull(),
+  // PENDING | PAID | COMPLETED | EXPIRED | CANCELLED | FAILED. Plain text: extending the
+  // machine must not rebuild the table; CAS guards below carry the real semantics.
+  status: text({ length: 50 }).notNull(),
+  channelTradeNo: text({ length: 255 }),
+  // JSON snapshot of the payment-channel config at order time (P2.5), frozen like the product.
+  providerSnapshot: text({ length: 2000 }),
+  expiresAt: integer({ mode: "timestamp" }),
+  paidAt: integer({ mode: "timestamp" }),
+  completedAt: integer({ mode: "timestamp" }),
+  failedReason: text({ length: 1000 }),
+}, (table) => ([
+  uniqueIndex('billing_order_out_order_no_unique').on(table.outOrderNo),
+  index('billing_order_user_idx').on(table.userId),
+  index('billing_order_status_idx').on(table.status),
+]));
+
+/** One redeemable card key. The `code` unique index is concurrency gate #1; the redeem CAS
+ * (`WHERE status = 'unused'`) is the authoritative one. */
+export const cardKeyTable = sqliteTable("card_key", {
+  ...commonColumns,
+  updateCounter: integer().$defaultFn(() => 0).$onUpdate(() => sql`updateCounter + 1`),
+  id: text().primaryKey().$defaultFn(() => `ckey_${createRandomId()}`).notNull(),
+  code: text({ length: 64 }).notNull(),
+  batchId: text({ length: 64 }).notNull(),
+  days: integer().notNull(),
+  // unused | used | disabled | expired. The redeem CAS keys on this column.
+  status: text({ length: 50 }).notNull(),
+  usedBy: text().references(() => userTable.id),
+  usedAt: integer({ mode: "timestamp" }),
+  // Optional absolute selling deadline; redeeming after it fails with CODE_EXPIRED.
+  expiresAt: integer({ mode: "timestamp" }),
+  note: text({ length: 500 }),
+}, (table) => ([
+  uniqueIndex('card_key_code_unique').on(table.code),
+  index('card_key_batch_idx').on(table.batchId),
+  index('card_key_status_idx').on(table.status),
+  index('card_key_used_by_idx').on(table.usedBy),
+]));
+
+/** A generation run of card keys: name/days/count for the admin list and CSV export. */
+export const cardKeyBatchTable = sqliteTable("card_key_batch", {
+  ...commonColumns,
+  updateCounter: integer().$defaultFn(() => 0).$onUpdate(() => sql`updateCounter + 1`),
+  id: text().primaryKey().$defaultFn(() => `cbat_${createRandomId()}`).notNull(),
+  name: text({ length: 255 }).notNull(),
+  days: integer().notNull(),
+  count: integer().notNull(),
+  createdBy: text().references(() => userTable.id),
+  note: text({ length: 500 }),
+}, (table) => ([
+  index('card_key_batch_created_idx').on(table.createdAt),
+]));
+
 // Team table
 export const teamTable = sqliteTable("team", {
   ...commonColumns,
@@ -633,6 +745,9 @@ const relationSchema = {
   apiKeyTable,
   authIdentityTable,
   bannedEmailTable,
+  billingOrderTable,
+  cardKeyBatchTable,
+  cardKeyTable,
   cmsNavigationItemTable,
   cmsNavigationRedirectTable,
   cmsEntryMediaTable,
@@ -641,6 +756,8 @@ const relationSchema = {
   cmsEntryVersionTable,
   cmsMediaTable,
   cmsTagTable,
+  membershipGrantTable,
+  membershipPlanTable,
   oauthAppTable,
   passKeyCredentialTable,
   scheduledJobTable,
@@ -879,6 +996,22 @@ export const relations = defineRelations(relationSchema, (r) => ({
       from: r.userTable.id,
       to: r.authIdentityTable.userId,
     }),
+    membershipGrants: r.many.membershipGrantTable({
+      from: r.userTable.id,
+      to: r.membershipGrantTable.userId,
+    }),
+    billingOrders: r.many.billingOrderTable({
+      from: r.userTable.id,
+      to: r.billingOrderTable.userId,
+    }),
+    redeemedCardKeys: r.many.cardKeyTable({
+      from: r.userTable.id,
+      to: r.cardKeyTable.usedBy,
+    }),
+    createdCardKeyBatches: r.many.cardKeyBatchTable({
+      from: r.userTable.id,
+      to: r.cardKeyBatchTable.createdBy,
+    }),
     ownedOAuthApps: r.many.oauthAppTable({
       from: r.userTable.id,
       to: r.oauthAppTable.ownerUserId,
@@ -946,6 +1079,34 @@ export const relations = defineRelations(relationSchema, (r) => ({
       optional: false,
     }),
   },
+  membershipGrantTable: {
+    user: r.one.userTable({
+      from: r.membershipGrantTable.userId,
+      to: r.userTable.id,
+      optional: false,
+    }),
+  },
+  billingOrderTable: {
+    user: r.one.userTable({
+      from: r.billingOrderTable.userId,
+      to: r.userTable.id,
+      optional: false,
+    }),
+  },
+  cardKeyTable: {
+    usedByUser: r.one.userTable({
+      from: r.cardKeyTable.usedBy,
+      to: r.userTable.id,
+      optional: true,
+    }),
+  },
+  cardKeyBatchTable: {
+    createdByUser: r.one.userTable({
+      from: r.cardKeyBatchTable.createdBy,
+      to: r.userTable.id,
+      optional: true,
+    }),
+  },
 }));
 
 // oxlint-disable-next-line project/no-unused-module-exports -- Drizzle schema model types are exported as app/tooling contracts.
@@ -988,3 +1149,13 @@ export type ScheduledJob = InferSelectModel<typeof scheduledJobTable>;
 export type UserBanEvent = InferSelectModel<typeof userBanEventTable>;
 // oxlint-disable-next-line project/no-unused-module-exports -- Drizzle schema model types are exported as app/tooling contracts.
 export type BannedEmail = InferSelectModel<typeof bannedEmailTable>;
+// oxlint-disable-next-line project/no-unused-module-exports -- Drizzle schema model types are exported as app/tooling contracts.
+export type MembershipPlan = InferSelectModel<typeof membershipPlanTable>;
+// oxlint-disable-next-line project/no-unused-module-exports -- Drizzle schema model types are exported as app/tooling contracts.
+export type MembershipGrant = InferSelectModel<typeof membershipGrantTable>;
+// oxlint-disable-next-line project/no-unused-module-exports -- Drizzle schema model types are exported as app/tooling contracts.
+export type BillingOrder = InferSelectModel<typeof billingOrderTable>;
+// oxlint-disable-next-line project/no-unused-module-exports -- Drizzle schema model types are exported as app/tooling contracts.
+export type CardKey = InferSelectModel<typeof cardKeyTable>;
+// oxlint-disable-next-line project/no-unused-module-exports -- Drizzle schema model types are exported as app/tooling contracts.
+export type CardKeyBatch = InferSelectModel<typeof cardKeyBatchTable>;
